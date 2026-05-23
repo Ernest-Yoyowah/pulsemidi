@@ -2,14 +2,14 @@ const SHARP_NAMES = [
   "C",
   "C#",
   "D",
-  "D#",
+  "Eb",
   "E",
   "F",
   "F#",
   "G",
-  "G#",
+  "Ab",
   "A",
-  "A#",
+  "Bb",
   "B",
 ] as const;
 
@@ -30,6 +30,8 @@ type ChordType = {
   required: number;
   optional: number;
   priority: number;
+  minNotes: number;
+  allowSlash: boolean;
 };
 
 function mask(intervals: readonly number[]): number {
@@ -44,268 +46,156 @@ function mask(intervals: readonly number[]): number {
 
 const CHORD_TYPES: readonly ChordType[] = [
   {
-    symbol: "maj13",
-    required: mask([0, 4, 11]),
-    optional: mask([2, 5, 7, 9]),
-    priority: 500,
-  },
-  {
-    symbol: "13",
-    required: mask([0, 4, 10]),
-    optional: mask([2, 5, 7, 9]),
-    priority: 490,
-  },
-  {
-    symbol: "m13",
-    required: mask([0, 3, 10]),
-    optional: mask([2, 5, 7, 9]),
-    priority: 480,
-  },
-  {
-    symbol: "maj11",
-    required: mask([0, 4, 11]),
-    optional: mask([2, 5, 7]),
-    priority: 470,
-  },
-  {
-    symbol: "11",
-    required: mask([0, 4, 10]),
-    optional: mask([2, 5, 7]),
-    priority: 460,
-  },
-  {
-    symbol: "m11",
-    required: mask([0, 3, 10]),
-    optional: mask([2, 5, 7]),
-    priority: 450,
-  },
-  {
-    symbol: "maj9",
-    required: mask([0, 4, 11]),
-    optional: mask([2, 7]),
-    priority: 440,
-  },
-  {
-    symbol: "9",
-    required: mask([0, 4, 10]),
-    optional: mask([2, 7]),
-    priority: 430,
-  },
-  {
-    symbol: "m9",
-    required: mask([0, 3, 10]),
-    optional: mask([2, 7]),
-    priority: 420,
-  },
-  {
-    symbol: "maj7#11",
-    required: mask([0, 4, 6, 11]),
-    optional: mask([2, 7]),
-    priority: 410,
-  },
-  {
-    symbol: "maj9#11",
-    required: mask([0, 4, 6, 11]),
-    optional: mask([2, 7]),
-    priority: 400,
-  },
-  {
-    symbol: "maj7",
-    required: mask([0, 4, 11]),
-    optional: mask([7]),
-    priority: 390,
-  },
-  {
-    symbol: "mMaj9",
-    required: mask([0, 3, 11]),
-    optional: mask([2, 7]),
-    priority: 380,
-  },
-  {
-    symbol: "mMaj7",
-    required: mask([0, 3, 11]),
-    optional: mask([7]),
-    priority: 370,
-  },
-  {
-    symbol: "7alt",
-    required: mask([0, 4, 10]),
-    optional: mask([1, 3, 6, 8]),
-    priority: 360,
-  },
-  {
-    symbol: "7#5#9",
-    required: mask([0, 4, 8, 10, 3]),
-    optional: 0,
-    priority: 350,
-  },
-  {
-    symbol: "7#5b9",
-    required: mask([0, 4, 8, 10, 1]),
-    optional: 0,
-    priority: 340,
-  },
-  {
-    symbol: "7b5#9",
-    required: mask([0, 4, 6, 10, 3]),
-    optional: 0,
-    priority: 330,
-  },
-  {
-    symbol: "7b5b9",
-    required: mask([0, 4, 6, 10, 1]),
-    optional: 0,
-    priority: 320,
-  },
-  {
-    symbol: "7#11",
-    required: mask([0, 4, 10, 6]),
-    optional: mask([2, 7]),
-    priority: 310,
-  },
-  {
-    symbol: "7b13",
-    required: mask([0, 4, 10, 8]),
-    optional: mask([2, 7]),
-    priority: 300,
-  },
-  {
-    symbol: "7#9",
-    required: mask([0, 4, 10, 3]),
-    optional: mask([7]),
-    priority: 290,
-  },
-  {
-    symbol: "7b9",
-    required: mask([0, 4, 10, 1]),
-    optional: mask([7]),
-    priority: 280,
-  },
-  {
-    symbol: "7#5",
-    required: mask([0, 4, 8, 10]),
-    optional: 0,
-    priority: 270,
-  },
-  {
-    symbol: "7b5",
-    required: mask([0, 4, 6, 10]),
-    optional: 0,
-    priority: 260,
-  },
-  {
-    symbol: "7sus4",
-    required: mask([0, 5, 10]),
-    optional: mask([7]),
-    priority: 250,
-  },
-  {
-    symbol: "7sus2",
-    required: mask([0, 2, 10]),
-    optional: mask([7]),
-    priority: 240,
-  },
-  {
-    symbol: "7",
-    required: mask([0, 4, 10]),
-    optional: mask([7]),
-    priority: 230,
-  },
-  {
-    symbol: "m7b5",
-    required: mask([0, 3, 6, 10]),
-    optional: 0,
-    priority: 220,
-  },
-  {
-    symbol: "dim7",
-    required: mask([0, 3, 6, 9]),
-    optional: 0,
-    priority: 210,
-  },
-  {
-    symbol: "m7",
-    required: mask([0, 3, 10]),
-    optional: mask([7]),
-    priority: 200,
-  },
-  {
-    symbol: "6/9",
-    required: mask([0, 4, 9]),
-    optional: mask([2, 7]),
-    priority: 190,
-  },
-  {
-    symbol: "6",
-    required: mask([0, 4, 9]),
-    optional: mask([7]),
-    priority: 180,
-  },
-  {
-    symbol: "m6",
-    required: mask([0, 3, 9]),
-    optional: mask([7]),
-    priority: 170,
-  },
-  {
-    symbol: "add11",
-    required: mask([0, 4, 5]),
-    optional: mask([7]),
-    priority: 160,
-  },
-  {
-    symbol: "add9",
-    required: mask([0, 2, 4]),
-    optional: mask([7]),
-    priority: 150,
-  },
-  {
-    symbol: "madd9",
-    required: mask([0, 2, 3]),
-    optional: mask([7]),
-    priority: 140,
-  },
-  {
     symbol: "sus4",
-    required: mask([0, 5]),
-    optional: mask([7]),
-    priority: 130,
+    required: mask([0, 5, 7]),
+    optional: 0,
+    priority: 1000,
+    minNotes: 3,
+    allowSlash: false,
   },
   {
     symbol: "sus2",
-    required: mask([0, 2]),
-    optional: mask([7]),
-    priority: 120,
+    required: mask([0, 2, 7]),
+    optional: 0,
+    priority: 990,
+    minNotes: 3,
+    allowSlash: false,
   },
   {
-    symbol: "aug",
-    required: mask([0, 4, 8]),
+    symbol: "",
+    required: mask([0, 4, 7]),
     optional: 0,
-    priority: 110,
+    priority: 980,
+    minNotes: 3,
+    allowSlash: false,
+  },
+  {
+    symbol: "m",
+    required: mask([0, 3, 7]),
+    optional: 0,
+    priority: 970,
+    minNotes: 3,
+    allowSlash: false,
   },
   {
     symbol: "dim",
     required: mask([0, 3, 6]),
     optional: 0,
-    priority: 100,
+    priority: 960,
+    minNotes: 3,
+    allowSlash: false,
   },
   {
-    symbol: "m",
-    required: mask([0, 3]),
-    optional: mask([7]),
-    priority: 90,
-  },
-  {
-    symbol: "",
-    required: mask([0, 4]),
-    optional: mask([7]),
-    priority: 80,
+    symbol: "aug",
+    required: mask([0, 4, 8]),
+    optional: 0,
+    priority: 950,
+    minNotes: 3,
+    allowSlash: false,
   },
   {
     symbol: "5",
     required: mask([0, 7]),
     optional: 0,
-    priority: 70,
+    priority: 940,
+    minNotes: 2,
+    allowSlash: false,
+  },
+  {
+    symbol: "7",
+    required: mask([0, 4, 7, 10]),
+    optional: 0,
+    priority: 930,
+    minNotes: 4,
+    allowSlash: true,
+  },
+  {
+    symbol: "maj7",
+    required: mask([0, 4, 7, 11]),
+    optional: 0,
+    priority: 920,
+    minNotes: 4,
+    allowSlash: true,
+  },
+  {
+    symbol: "m7",
+    required: mask([0, 3, 7, 10]),
+    optional: 0,
+    priority: 910,
+    minNotes: 4,
+    allowSlash: true,
+  },
+  {
+    symbol: "m7b5",
+    required: mask([0, 3, 6, 10]),
+    optional: 0,
+    priority: 900,
+    minNotes: 4,
+    allowSlash: true,
+  },
+  {
+    symbol: "dim7",
+    required: mask([0, 3, 6, 9]),
+    optional: 0,
+    priority: 890,
+    minNotes: 4,
+    allowSlash: true,
+  },
+  {
+    symbol: "add9",
+    required: mask([0, 2, 4, 7]),
+    optional: 0,
+    priority: 880,
+    minNotes: 4,
+    allowSlash: false,
+  },
+  {
+    symbol: "madd9",
+    required: mask([0, 2, 3, 7]),
+    optional: 0,
+    priority: 870,
+    minNotes: 4,
+    allowSlash: false,
+  },
+  {
+    symbol: "6",
+    required: mask([0, 4, 7, 9]),
+    optional: 0,
+    priority: 860,
+    minNotes: 4,
+    allowSlash: true,
+  },
+  {
+    symbol: "m6",
+    required: mask([0, 3, 7, 9]),
+    optional: 0,
+    priority: 850,
+    minNotes: 4,
+    allowSlash: true,
+  },
+  {
+    symbol: "9",
+    required: mask([0, 2, 4, 7, 10]),
+    optional: 0,
+    priority: 840,
+    minNotes: 5,
+    allowSlash: true,
+  },
+  {
+    symbol: "maj9",
+    required: mask([0, 2, 4, 7, 11]),
+    optional: 0,
+    priority: 830,
+    minNotes: 5,
+    allowSlash: true,
+  },
+  {
+    symbol: "m9",
+    required: mask([0, 2, 3, 7, 10]),
+    optional: 0,
+    priority: 820,
+    minNotes: 5,
+    allowSlash: true,
   },
 ];
 
@@ -345,12 +235,60 @@ function inversionOf(root: number, pcs: number[], bass: number): number {
   );
 }
 
+function detectInterval(pcs: number[]): string | null {
+  if (pcs.length !== 2) {
+    return null;
+  }
+
+  const interval = (pcs[1] - pcs[0] + 12) % 12;
+
+  switch (interval) {
+    case 0:
+      return "Unison";
+    case 1:
+      return "Minor 2nd";
+    case 2:
+      return "Major 2nd";
+    case 3:
+      return "Minor 3rd";
+    case 4:
+      return "Major 3rd";
+    case 5:
+      return "Perfect 4th";
+    case 6:
+      return "Tritone";
+    case 7:
+      return "Perfect 5th";
+    case 8:
+      return "Minor 6th";
+    case 9:
+      return "Major 6th";
+    case 10:
+      return "Minor 7th";
+    case 11:
+      return "Major 7th";
+    default:
+      return null;
+  }
+}
+
 export function detectChord(noteNumbers: number[]): ChordResult | null {
   if (noteNumbers.length < 2) {
     return null;
   }
 
   const pcs = normalize(noteNumbers);
+
+  const intervalName = detectInterval(pcs);
+
+  if (intervalName) {
+    return {
+      name: intervalName,
+      root: "",
+      symbol: "",
+      inversion: 0,
+    };
+  }
 
   const bassPc = ((Math.min(...noteNumbers) % 12) + 12) % 12;
 
@@ -365,9 +303,11 @@ export function detectChord(noteNumbers: number[]): ChordResult | null {
     const chordMask = notesToMask(pcs, root);
 
     for (const chord of CHORD_TYPES) {
-      const requiredOk = (chordMask & chord.required) === chord.required;
+      if (pcs.length < chord.minNotes) {
+        continue;
+      }
 
-      if (!requiredOk) {
+      if ((chordMask & chord.required) !== chord.required) {
         continue;
       }
 
@@ -381,7 +321,10 @@ export function detectChord(noteNumbers: number[]): ChordResult | null {
 
       const bassStr = rootName(bassPc);
 
-      const slash = bassPc !== root ? `/${bassStr}` : "";
+      const slash =
+        chord.allowSlash && pcs.length >= 4 && bassPc !== root
+          ? `/${bassStr}`
+          : "";
 
       const inversion = inversionOf(root, pcs, bassPc);
 
@@ -389,7 +332,7 @@ export function detectChord(noteNumbers: number[]): ChordResult | null {
         name: `${rootStr}${chord.symbol}${slash}`,
         root: rootStr,
         symbol: chord.symbol,
-        bass: bassPc !== root ? bassStr : undefined,
+        bass: slash ? bassStr : undefined,
         inversion,
       };
 

@@ -12,6 +12,8 @@ pub struct ChordType {
     pub required: u16,
     pub optional: u16,
     pub priority: u32,
+    pub min_notes: usize,
+    pub allow_slash: bool,
 }
 
 const fn mask(intervals: &[u8]) -> u16 {
@@ -28,268 +30,156 @@ const fn mask(intervals: &[u8]) -> u16 {
 
 const CHORD_TYPES: &[ChordType] = &[
     ChordType {
-        symbol: "maj13",
-        required: mask(&[0, 4, 11]),
-        optional: mask(&[2, 5, 7, 9]),
-        priority: 500,
-    },
-    ChordType {
-        symbol: "13",
-        required: mask(&[0, 4, 10]),
-        optional: mask(&[2, 5, 7, 9]),
-        priority: 490,
-    },
-    ChordType {
-        symbol: "m13",
-        required: mask(&[0, 3, 10]),
-        optional: mask(&[2, 5, 7, 9]),
-        priority: 480,
-    },
-    ChordType {
-        symbol: "maj11",
-        required: mask(&[0, 4, 11]),
-        optional: mask(&[2, 5, 7]),
-        priority: 470,
-    },
-    ChordType {
-        symbol: "11",
-        required: mask(&[0, 4, 10]),
-        optional: mask(&[2, 5, 7]),
-        priority: 460,
-    },
-    ChordType {
-        symbol: "m11",
-        required: mask(&[0, 3, 10]),
-        optional: mask(&[2, 5, 7]),
-        priority: 450,
-    },
-    ChordType {
-        symbol: "maj9",
-        required: mask(&[0, 4, 11]),
-        optional: mask(&[2, 7]),
-        priority: 440,
-    },
-    ChordType {
-        symbol: "9",
-        required: mask(&[0, 4, 10]),
-        optional: mask(&[2, 7]),
-        priority: 430,
-    },
-    ChordType {
-        symbol: "m9",
-        required: mask(&[0, 3, 10]),
-        optional: mask(&[2, 7]),
-        priority: 420,
-    },
-    ChordType {
-        symbol: "maj7#11",
-        required: mask(&[0, 4, 6, 11]),
-        optional: mask(&[2, 7]),
-        priority: 410,
-    },
-    ChordType {
-        symbol: "maj9#11",
-        required: mask(&[0, 4, 6, 11]),
-        optional: mask(&[2, 7]),
-        priority: 400,
-    },
-    ChordType {
-        symbol: "maj7",
-        required: mask(&[0, 4, 11]),
-        optional: mask(&[7]),
-        priority: 390,
-    },
-    ChordType {
-        symbol: "mMaj9",
-        required: mask(&[0, 3, 11]),
-        optional: mask(&[2, 7]),
-        priority: 380,
-    },
-    ChordType {
-        symbol: "mMaj7",
-        required: mask(&[0, 3, 11]),
-        optional: mask(&[7]),
-        priority: 370,
-    },
-    ChordType {
-        symbol: "7alt",
-        required: mask(&[0, 4, 10]),
-        optional: mask(&[1, 3, 6, 8]),
-        priority: 360,
-    },
-    ChordType {
-        symbol: "7#5#9",
-        required: mask(&[0, 4, 8, 10, 3]),
-        optional: 0,
-        priority: 350,
-    },
-    ChordType {
-        symbol: "7#5b9",
-        required: mask(&[0, 4, 8, 10, 1]),
-        optional: 0,
-        priority: 340,
-    },
-    ChordType {
-        symbol: "7b5#9",
-        required: mask(&[0, 4, 6, 10, 3]),
-        optional: 0,
-        priority: 330,
-    },
-    ChordType {
-        symbol: "7b5b9",
-        required: mask(&[0, 4, 6, 10, 1]),
-        optional: 0,
-        priority: 320,
-    },
-    ChordType {
-        symbol: "7#11",
-        required: mask(&[0, 4, 10, 6]),
-        optional: mask(&[2, 7]),
-        priority: 310,
-    },
-    ChordType {
-        symbol: "7b13",
-        required: mask(&[0, 4, 10, 8]),
-        optional: mask(&[2, 7]),
-        priority: 300,
-    },
-    ChordType {
-        symbol: "7#9",
-        required: mask(&[0, 4, 10, 3]),
-        optional: mask(&[7]),
-        priority: 290,
-    },
-    ChordType {
-        symbol: "7b9",
-        required: mask(&[0, 4, 10, 1]),
-        optional: mask(&[7]),
-        priority: 280,
-    },
-    ChordType {
-        symbol: "7#5",
-        required: mask(&[0, 4, 8, 10]),
-        optional: 0,
-        priority: 270,
-    },
-    ChordType {
-        symbol: "7b5",
-        required: mask(&[0, 4, 6, 10]),
-        optional: 0,
-        priority: 260,
-    },
-    ChordType {
-        symbol: "7sus4",
-        required: mask(&[0, 5, 10]),
-        optional: mask(&[7]),
-        priority: 250,
-    },
-    ChordType {
-        symbol: "7sus2",
-        required: mask(&[0, 2, 10]),
-        optional: mask(&[7]),
-        priority: 240,
-    },
-    ChordType {
-        symbol: "7",
-        required: mask(&[0, 4, 10]),
-        optional: mask(&[7]),
-        priority: 230,
-    },
-    ChordType {
-        symbol: "m7b5",
-        required: mask(&[0, 3, 6, 10]),
-        optional: 0,
-        priority: 220,
-    },
-    ChordType {
-        symbol: "dim7",
-        required: mask(&[0, 3, 6, 9]),
-        optional: 0,
-        priority: 210,
-    },
-    ChordType {
-        symbol: "m7",
-        required: mask(&[0, 3, 10]),
-        optional: mask(&[7]),
-        priority: 200,
-    },
-    ChordType {
-        symbol: "6/9",
-        required: mask(&[0, 4, 9]),
-        optional: mask(&[2, 7]),
-        priority: 190,
-    },
-    ChordType {
-        symbol: "6",
-        required: mask(&[0, 4, 9]),
-        optional: mask(&[7]),
-        priority: 180,
-    },
-    ChordType {
-        symbol: "m6",
-        required: mask(&[0, 3, 9]),
-        optional: mask(&[7]),
-        priority: 170,
-    },
-    ChordType {
-        symbol: "add11",
-        required: mask(&[0, 4, 5]),
-        optional: mask(&[7]),
-        priority: 160,
-    },
-    ChordType {
-        symbol: "add9",
-        required: mask(&[0, 2, 4]),
-        optional: mask(&[7]),
-        priority: 150,
-    },
-    ChordType {
-        symbol: "madd9",
-        required: mask(&[0, 2, 3]),
-        optional: mask(&[7]),
-        priority: 140,
-    },
-    ChordType {
         symbol: "sus4",
-        required: mask(&[0, 5]),
-        optional: mask(&[7]),
-        priority: 130,
+        required: mask(&[0, 5, 7]),
+        optional: 0,
+        priority: 1000,
+        min_notes: 3,
+        allow_slash: false,
     },
     ChordType {
         symbol: "sus2",
-        required: mask(&[0, 2]),
-        optional: mask(&[7]),
-        priority: 120,
+        required: mask(&[0, 2, 7]),
+        optional: 0,
+        priority: 990,
+        min_notes: 3,
+        allow_slash: false,
     },
     ChordType {
-        symbol: "aug",
-        required: mask(&[0, 4, 8]),
+        symbol: "",
+        required: mask(&[0, 4, 7]),
         optional: 0,
-        priority: 110,
+        priority: 980,
+        min_notes: 3,
+        allow_slash: false,
+    },
+    ChordType {
+        symbol: "m",
+        required: mask(&[0, 3, 7]),
+        optional: 0,
+        priority: 970,
+        min_notes: 3,
+        allow_slash: false,
     },
     ChordType {
         symbol: "dim",
         required: mask(&[0, 3, 6]),
         optional: 0,
-        priority: 100,
+        priority: 960,
+        min_notes: 3,
+        allow_slash: false,
     },
     ChordType {
-        symbol: "m",
-        required: mask(&[0, 3]),
-        optional: mask(&[7]),
-        priority: 90,
-    },
-    ChordType {
-        symbol: "",
-        required: mask(&[0, 4]),
-        optional: mask(&[7]),
-        priority: 80,
+        symbol: "aug",
+        required: mask(&[0, 4, 8]),
+        optional: 0,
+        priority: 950,
+        min_notes: 3,
+        allow_slash: false,
     },
     ChordType {
         symbol: "5",
         required: mask(&[0, 7]),
         optional: 0,
-        priority: 70,
+        priority: 940,
+        min_notes: 2,
+        allow_slash: false,
+    },
+    ChordType {
+        symbol: "7",
+        required: mask(&[0, 4, 7, 10]),
+        optional: 0,
+        priority: 930,
+        min_notes: 4,
+        allow_slash: true,
+    },
+    ChordType {
+        symbol: "maj7",
+        required: mask(&[0, 4, 7, 11]),
+        optional: 0,
+        priority: 920,
+        min_notes: 4,
+        allow_slash: true,
+    },
+    ChordType {
+        symbol: "m7",
+        required: mask(&[0, 3, 7, 10]),
+        optional: 0,
+        priority: 910,
+        min_notes: 4,
+        allow_slash: true,
+    },
+    ChordType {
+        symbol: "m7b5",
+        required: mask(&[0, 3, 6, 10]),
+        optional: 0,
+        priority: 900,
+        min_notes: 4,
+        allow_slash: true,
+    },
+    ChordType {
+        symbol: "dim7",
+        required: mask(&[0, 3, 6, 9]),
+        optional: 0,
+        priority: 890,
+        min_notes: 4,
+        allow_slash: true,
+    },
+    ChordType {
+        symbol: "add9",
+        required: mask(&[0, 2, 4, 7]),
+        optional: 0,
+        priority: 880,
+        min_notes: 4,
+        allow_slash: false,
+    },
+    ChordType {
+        symbol: "madd9",
+        required: mask(&[0, 2, 3, 7]),
+        optional: 0,
+        priority: 870,
+        min_notes: 4,
+        allow_slash: false,
+    },
+    ChordType {
+        symbol: "6",
+        required: mask(&[0, 4, 7, 9]),
+        optional: 0,
+        priority: 860,
+        min_notes: 4,
+        allow_slash: true,
+    },
+    ChordType {
+        symbol: "m6",
+        required: mask(&[0, 3, 7, 9]),
+        optional: 0,
+        priority: 850,
+        min_notes: 4,
+        allow_slash: true,
+    },
+    ChordType {
+        symbol: "9",
+        required: mask(&[0, 2, 4, 7, 10]),
+        optional: 0,
+        priority: 840,
+        min_notes: 5,
+        allow_slash: true,
+    },
+    ChordType {
+        symbol: "maj9",
+        required: mask(&[0, 2, 4, 7, 11]),
+        optional: 0,
+        priority: 830,
+        min_notes: 5,
+        allow_slash: true,
+    },
+    ChordType {
+        symbol: "m9",
+        required: mask(&[0, 2, 3, 7, 10]),
+        optional: 0,
+        priority: 820,
+        min_notes: 5,
+        allow_slash: true,
     },
 ];
 
@@ -301,15 +191,24 @@ pub struct ChordResult {
     pub inversion: usize,
 }
 
+fn normalize(notes: &[u8]) -> Vec<u8> {
+    let mut pcs: Vec<u8> = notes.iter().map(|n| n % 12).collect();
+
+    pcs.sort_unstable();
+    pcs.dedup();
+
+    pcs
+}
+
 fn notes_to_mask(notes: &[u8], root: u8) -> u16 {
-    let mut mask = 0u16;
+    let mut out = 0u16;
 
     for &n in notes {
         let interval = (n + 12 - root) % 12;
-        mask |= 1 << interval;
+        out |= 1 << interval;
     }
 
-    mask
+    out
 }
 
 fn inversion_of(root: u8, pcs: &[u8], bass: u8) -> usize {
@@ -328,15 +227,48 @@ fn inversion_of(root: u8, pcs: &[u8], bass: u8) -> usize {
         .unwrap_or(0)
 }
 
+fn detect_interval(pcs: &[u8]) -> Option<String> {
+    if pcs.len() != 2 {
+        return None;
+    }
+
+    let interval = (pcs[1] + 12 - pcs[0]) % 12;
+
+    let name = match interval {
+        0 => "Unison",
+        1 => "Minor 2nd",
+        2 => "Major 2nd",
+        3 => "Minor 3rd",
+        4 => "Major 3rd",
+        5 => "Perfect 4th",
+        6 => "Tritone",
+        7 => "Perfect 5th",
+        8 => "Minor 6th",
+        9 => "Major 6th",
+        10 => "Minor 7th",
+        11 => "Major 7th",
+        _ => return None,
+    };
+
+    Some(name.to_string())
+}
+
 pub fn detect_chord(notes: &[u8]) -> Option<ChordResult> {
     if notes.len() < 2 {
         return None;
     }
 
-    let mut pcs: Vec<u8> = notes.iter().map(|n| n % 12).collect();
+    let pcs = normalize(notes);
 
-    pcs.sort_unstable();
-    pcs.dedup();
+    if let Some(interval_name) = detect_interval(&pcs) {
+        return Some(ChordResult {
+            name: interval_name,
+            root: String::new(),
+            symbol: String::new(),
+            bass: None,
+            inversion: 0,
+        });
+    }
 
     let bass_pc = notes.iter().min().unwrap() % 12;
 
@@ -346,10 +278,11 @@ pub fn detect_chord(notes: &[u8]) -> Option<ChordResult> {
         let chord_mask = notes_to_mask(&pcs, root);
 
         for chord in CHORD_TYPES {
-            let required_ok =
-                (chord_mask & chord.required) == chord.required;
+            if pcs.len() < chord.min_notes {
+                continue;
+            }
 
-            if !required_ok {
+            if (chord_mask & chord.required) != chord.required {
                 continue;
             }
 
@@ -361,40 +294,34 @@ pub fn detect_chord(notes: &[u8]) -> Option<ChordResult> {
 
             let root_name = FLAT_NAMES[root as usize].to_string();
 
-            let bass_name =
-                FLAT_NAMES[bass_pc as usize].to_string();
+            let bass_name = FLAT_NAMES[bass_pc as usize].to_string();
 
-            let slash = if bass_pc != root {
+            let slash = if chord.allow_slash
+                && pcs.len() >= 4
+                && bass_pc != root
+            {
                 format!("/{}", bass_name)
             } else {
                 String::new()
             };
 
-            let inversion =
-                inversion_of(root, &pcs, bass_pc);
+            let inversion = inversion_of(root, &pcs, bass_pc);
 
             let result = ChordResult {
-                name: format!(
-                    "{}{}{}",
-                    root_name,
-                    chord.symbol,
-                    slash
-                ),
+                name: format!("{}{}{}", root_name, chord.symbol, slash),
                 root: root_name,
                 symbol: chord.symbol.to_string(),
-                bass: if bass_pc != root {
-                    Some(bass_name)
-                } else {
+                bass: if slash.is_empty() {
                     None
+                } else {
+                    Some(bass_name)
                 },
                 inversion,
             };
 
             match &best {
                 Some((p, _)) if *p >= chord.priority => {}
-                _ => {
-                    best = Some((chord.priority, result));
-                }
+                _ => best = Some((chord.priority, result)),
             }
         }
     }
