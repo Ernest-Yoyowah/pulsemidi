@@ -173,9 +173,3 @@ process() callback             cx.spawn() proxy thread
 ## About
 
 Created by **Ernest Keyz** / **Ernest Keyz Studios**.
-
----
-
-## License
-
-© 2026 Ernest Keyz Studios — All Rights Reserved
