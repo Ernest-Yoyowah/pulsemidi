@@ -171,6 +171,26 @@ pub fn run() {
         .manage(Mutex::new(MidiState {
             connections: Vec::new(),
         }))
+        .setup(|app| {
+            let app_handle = app.handle().clone();
+            std::thread::spawn(move || {
+                let mut last_count = new_midi_input("pulsemidi-hotplug-init")
+                    .map(|m| m.ports().len())
+                    .unwrap_or(0);
+
+                loop {
+                    std::thread::sleep(std::time::Duration::from_secs(2));
+                    let count = new_midi_input("pulsemidi-hotplug")
+                        .map(|m| m.ports().len())
+                        .unwrap_or(0);
+                    if count != last_count {
+                        last_count = count;
+                        let _ = app_handle.emit("midi-ports-changed", count as u32);
+                    }
+                }
+            });
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             list_midi_inputs,
             connect_all_midi_inputs,

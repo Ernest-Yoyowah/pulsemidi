@@ -1,11 +1,28 @@
 import { useMemo } from "react";
 import { useMidiStore } from "../store/midiStore";
-import {
-  isBlackKey,
-  PIANO_MIN,
-  PIANO_MAX,
-  velocityToOpacity,
-} from "../utils/noteUtils";
+import { isBlackKey, PIANO_MIN, PIANO_MAX } from "../utils/noteUtils";
+
+function hexToRgba(hex: string, alpha: number): string {
+  const clean = hex.replace("#", "");
+  const r = parseInt(clean.slice(0, 2), 16);
+  const g = parseInt(clean.slice(2, 4), 16);
+  const b = parseInt(clean.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha.toFixed(2)})`;
+}
+
+function activeKeyStyle(
+  velocity: number,
+  isBlack: boolean,
+  color: string,
+): React.CSSProperties {
+  const v = velocity / 127;
+  const opacity = isBlack ? 0.65 + v * 0.35 : 0.60 + v * 0.40;
+  const glow = Math.round(8 + v * 12);
+  return {
+    background: hexToRgba(color, opacity),
+    boxShadow: `0 0 ${glow}px ${hexToRgba(color, 0.75)}`,
+  };
+}
 
 const WHITE_KEY_W = 28;
 const WHITE_KEY_H = 100;
@@ -46,6 +63,7 @@ const PIANO_WIDTH = TOTAL_WHITE_KEYS * WHITE_KEY_W;
 
 export default function PianoKeyboard() {
   const activeNotes = useMidiStore((s) => s.activeNotes);
+  const activeKeyColor = useMidiStore((s) => s.activeKeyColor);
 
   const activeSet = useMemo(() => new Set(activeNotes.keys()), [activeNotes]);
 
@@ -59,10 +77,6 @@ export default function PianoKeyboard() {
         {KEY_LAYOUT.filter((k) => !k.isBlack).map(({ note, x }) => {
           const active = activeSet.has(note);
           const event = active ? activeNotes.get(note) : undefined;
-          const opacity =
-            event?.velocity !== undefined
-              ? velocityToOpacity(event.velocity)
-              : 0;
 
           return (
             <div
@@ -81,10 +95,7 @@ export default function PianoKeyboard() {
                 className="w-full h-full rounded-b-sm transition-colors duration-75"
                 style={
                   active
-                    ? {
-                        background: `rgba(0, 210, 220, ${opacity})`,
-                        boxShadow: `0 0 8px rgba(0, 210, 220, ${opacity * 0.8})`,
-                      }
+                    ? activeKeyStyle(event?.velocity ?? 80, false, activeKeyColor)
                     : { background: "#e8e8e8" }
                 }
               />
@@ -95,10 +106,6 @@ export default function PianoKeyboard() {
         {KEY_LAYOUT.filter((k) => k.isBlack).map(({ note, x }) => {
           const active = activeSet.has(note);
           const event = active ? activeNotes.get(note) : undefined;
-          const opacity =
-            event?.velocity !== undefined
-              ? velocityToOpacity(event.velocity)
-              : 0;
 
           return (
             <div
@@ -115,13 +122,10 @@ export default function PianoKeyboard() {
               className="rounded-b-sm"
             >
               <div
-                className="w-full h-full rounded-b-sm transition-colors duration-75"
+                className="w-full h-full rounded-b-sm transition-all duration-75"
                 style={
                   active
-                    ? {
-                        background: `rgba(0, 210, 220, ${opacity})`,
-                        boxShadow: `0 0 10px rgba(0, 210, 220, ${opacity})`,
-                      }
+                    ? activeKeyStyle(event?.velocity ?? 80, true, activeKeyColor)
                     : { background: "#1a1a1a" }
                 }
               />
@@ -130,13 +134,16 @@ export default function PianoKeyboard() {
         })}
       </div>
 
-      <div className="mt-2 flex items-center gap-4 text-[10px] text-zinc-600">
-        <span>A0 → C8 • 88 keys</span>
-        {activeSet.size > 0 && (
-          <span className="text-cyan-400">
-            {activeSet.size} note{activeSet.size !== 1 ? "s" : ""} held
-          </span>
-        )}
+      <div className="mt-2 flex items-center justify-between text-[10px] text-zinc-600">
+        <div className="flex items-center gap-4">
+          <span>A0 → C8 • 88 keys</span>
+          {activeSet.size > 0 && (
+            <span className="text-cyan-400">
+              {activeSet.size} note{activeSet.size !== 1 ? "s" : ""} held
+            </span>
+          )}
+        </div>
+        <span className="text-zinc-700 font-mono tracking-wide">Ernest Keyz Studios</span>
       </div>
     </div>
   );

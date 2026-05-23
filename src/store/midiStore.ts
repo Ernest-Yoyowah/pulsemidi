@@ -34,9 +34,19 @@ interface MidiStore {
 
   ccValues: Map<number, number>;
 
+  touchedCCs: number[];
+
+  bpm: number | null;
+
+  clockBuffer: number[];
+  pitchBend: number;
+
+  activeKeyColor: string;
+
   addEvent: (event: MidiEvent) => void;
   clearEvents: () => void;
   setPaused: (paused: boolean) => void;
+  setActiveKeyColor: (color: string) => void;
 }
 
 function updateDiagnostics(
@@ -125,6 +135,14 @@ export const useMidiStore = create<MidiStore>((set, get) => ({
 
   ccValues: new Map(),
 
+  touchedCCs: [],
+
+  bpm: null,
+  clockBuffer: [],
+  pitchBend: 0,
+
+  activeKeyColor: '#22d3ee',
+
   diagnostics: {
     stuckNotes: [],
     ccSpam: [],
@@ -153,8 +171,12 @@ export const useMidiStore = create<MidiStore>((set, get) => ({
       }
 
       const ccValues = new Map(state.ccValues);
+      let touchedCCs = state.touchedCCs;
       if (event.type === "controlChange" && event.controller !== undefined) {
         ccValues.set(event.controller, event.value ?? 0);
+        const cc = event.controller;
+        const filtered = touchedCCs.filter((c) => c !== cc);
+        touchedCCs = [cc, ...filtered].slice(0, 20);
       }
 
       const diagnostics = updateDiagnostics(
@@ -168,7 +190,32 @@ export const useMidiStore = create<MidiStore>((set, get) => ({
           ? [...state.events.slice(-MAX_LOG_EVENTS + 1), event]
           : [...state.events, event];
 
-      return { events, activeNotes, ccValues, diagnostics };
+      let bpm = state.bpm;
+      let clockBuffer = state.clockBuffer;
+      if (event.type === "clock") {
+        clockBuffer = [...clockBuffer, event.timestamp].slice(-25);
+        if (clockBuffer.length === 25) {
+          const beatMs = clockBuffer[24] - clockBuffer[0];
+          const candidate = Math.round(60000 / beatMs);
+          if (candidate >= 20 && candidate <= 300) bpm = candidate;
+        }
+      }
+
+      const pitchBend =
+        event.type === "pitchBend" && event.bendValue !== undefined
+          ? event.bendValue
+          : state.pitchBend;
+
+      return {
+        events,
+        activeNotes,
+        ccValues,
+        diagnostics,
+        bpm,
+        clockBuffer,
+        pitchBend,
+        touchedCCs,
+      };
     });
   },
 
@@ -177,6 +224,10 @@ export const useMidiStore = create<MidiStore>((set, get) => ({
       events: [],
       activeNotes: new Map(),
       ccValues: new Map(),
+      touchedCCs: [],
+      bpm: null,
+      clockBuffer: [],
+      pitchBend: 0,
       diagnostics: {
         stuckNotes: [],
         ccSpam: [],
@@ -187,4 +238,5 @@ export const useMidiStore = create<MidiStore>((set, get) => ({
     }),
 
   setPaused: (paused) => set({ isPaused: paused }),
+  setActiveKeyColor: (color) => set({ activeKeyColor: color }),
 }));

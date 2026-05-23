@@ -3,8 +3,6 @@ import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { MidiDevice, MidiEvent } from "../types";
 import { parseMidiMessage } from "../utils/midiParser";
 
-// ─── IPC Types ────────────────────────────────────────────────────────────────
-
 interface TauriMidiPort {
   index: number;
   name: string;
@@ -17,20 +15,16 @@ interface TauriMidiMessagePayload {
   data: number[];
 }
 
-// ─── Callbacks ────────────────────────────────────────────────────────────────
-
 type MidiEventCallback = (event: MidiEvent) => void;
 type DeviceChangeCallback = (devices: MidiDevice[]) => void;
-
-// ─── Service ─────────────────────────────────────────────────────────────────
 
 class MidiService {
   private onEvent: MidiEventCallback | null = null;
   private onDeviceChange: DeviceChangeCallback | null = null;
   private unlisten: UnlistenFn | null = null;
+  private unlistenPorts: UnlistenFn | null = null;
 
-  // ── Init ─────────────────────────────────────────────────────────────────
-  // Subscribes to the Rust `midi-message` event stream. No Web MIDI needed.
+  private selectedDeviceId: string | null = null;
 
   async init(): Promise<{ ok: boolean; error?: string }> {
     try {
@@ -38,8 +32,6 @@ class MidiService {
         "midi-message",
         (evt) => {
           const { deviceId, deviceName, data } = evt.payload;
-          // Use frontend wall-clock time so all Date.now() comparisons work correctly.
-          // midir timestamps are µs since device open — incompatible with epoch ms.
           const event = parseMidiMessage(
             new Uint8Array(data),
             Date.now(),
@@ -49,14 +41,25 @@ class MidiService {
           this.onEvent?.(event);
         },
       );
+
+      this.unlistenPorts = await listen<number>(
+        "midi-ports-changed",
+        async () => {
+          console.log("[MidiService] MIDI ports changed — reconnecting...");
+          if (this.selectedDeviceId === null) {
+            await this.selectAll();
+          } else {
+            await this.selectDevice(this.selectedDeviceId);
+          }
+        },
+      );
+
       return { ok: true };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       return { ok: false, error: `MIDI init failed: ${message}` };
     }
   }
-
-  // ── Callbacks ─────────────────────────────────────────────────────────────
 
   setOnEvent(cb: MidiEventCallback) {
     this.onEvent = cb;
@@ -66,10 +69,8 @@ class MidiService {
     this.onDeviceChange = cb;
   }
 
-  // ── Device operations ─────────────────────────────────────────────────────
-
-  /** Connect to all available MIDI inputs (default mode). */
   async selectAll(): Promise<void> {
+    this.selectedDeviceId = null;
     try {
       const ports: TauriMidiPort[] = await invoke("connect_all_midi_inputs");
       this.onDeviceChange?.(this._portsToDevices(ports));
@@ -79,12 +80,12 @@ class MidiService {
     }
   }
 
-  /** Connect to a single device, or all if id is null. */
   async selectDevice(deviceId: string | null): Promise<void> {
     if (deviceId === null) {
       await this.selectAll();
       return;
     }
+    this.selectedDeviceId = deviceId;
     const portIndex = parseInt(deviceId.replace("port-", ""), 10);
     if (isNaN(portIndex)) return;
     try {
@@ -97,7 +98,6 @@ class MidiService {
     }
   }
 
-  /** Refresh device list without changing active connections. */
   async listDevices(): Promise<MidiDevice[]> {
     try {
       const ports: TauriMidiPort[] = await invoke("list_midi_inputs");
@@ -107,16 +107,13 @@ class MidiService {
     }
   }
 
-  // ── Cleanup ───────────────────────────────────────────────────────────────
-
   dispose(): void {
     this.unlisten?.();
+    this.unlistenPorts?.();
     invoke("disconnect_all_midi_inputs").catch(() => {});
     this.onEvent = null;
     this.onDeviceChange = null;
   }
-
-  // ── Helpers ───────────────────────────────────────────────────────────────
 
   private _portToDevice(port: TauriMidiPort): MidiDevice {
     return {

@@ -26,7 +26,7 @@ export function isBlackKey(note: number): boolean {
 
 export const PIANO_MIN = 21;
 export const PIANO_MAX = 108;
-export const PIANO_KEY_COUNT = PIANO_MAX - PIANO_MIN + 1; // 88
+export const PIANO_KEY_COUNT = PIANO_MAX - PIANO_MIN + 1;
 
 const CC_NAMES: Record<number, string> = {
   0: "Bank Select",
