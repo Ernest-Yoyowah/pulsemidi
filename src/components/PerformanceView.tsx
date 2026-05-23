@@ -16,7 +16,15 @@ function SustainPedalIcon() {
     >
       <rect x="3" y="10" width="16" height="3" rx="1.5" fill="#22d3ee" />
       <rect x="10" y="2" width="2" height="8" rx="1" fill="#22d3ee" />
-      <rect x="1" y="13" width="20" height="2" rx="1" fill="#22d3ee" opacity="0.5" />
+      <rect
+        x="1"
+        y="13"
+        width="20"
+        height="2"
+        rx="1"
+        fill="#22d3ee"
+        opacity="0.5"
+      />
     </svg>
   );
 }

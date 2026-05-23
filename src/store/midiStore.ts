@@ -141,7 +141,7 @@ export const useMidiStore = create<MidiStore>((set, get) => ({
   clockBuffer: [],
   pitchBend: 0,
 
-  activeKeyColor: '#22d3ee',
+  activeKeyColor: "#22d3ee",
 
   diagnostics: {
     stuckNotes: [],

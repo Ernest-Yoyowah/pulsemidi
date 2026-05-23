@@ -43,7 +43,9 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-panel" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+        <button className="modal-close" onClick={onClose} aria-label="Close">
+          ✕
+        </button>
         <div className="modal-title">Settings</div>
 
         <div className="modal-section">
@@ -91,7 +93,9 @@ function AboutModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-panel" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+        <button className="modal-close" onClick={onClose} aria-label="Close">
+          ✕
+        </button>
 
         <div className="about-logo">
           <span className="about-logo__pulse">PULSE</span>
@@ -102,10 +106,12 @@ function AboutModal({ onClose }: { onClose: () => void }) {
         <div className="modal-section">
           <div className="modal-section-title">Created by</div>
           <p style={{ fontSize: 13, color: "#a1a1aa", marginBottom: 4 }}>
-            <strong style={{ color: "#e4e4e7" }}>Ernest Keyz</strong> / Ernest Keyz Studios
+            <strong style={{ color: "#e4e4e7" }}>Ernest Keyz</strong> / Ernest
+            Keyz Studios
           </p>
           <p style={{ fontSize: 11, color: "#52525b" }}>
-            Real-time MIDI monitoring, chord detection & performance visualisation
+            Real-time MIDI monitoring, chord detection & performance
+            visualisation
           </p>
         </div>
 
@@ -135,7 +141,9 @@ function AboutModal({ onClose }: { onClose: () => void }) {
 
         <div className="modal-section" style={{ marginBottom: 0 }}>
           <div className="modal-section-title">License</div>
-          <p style={{ fontSize: 11, color: "#52525b" }}>MIT © Ernest Keyz Studios</p>
+          <p style={{ fontSize: 11, color: "#52525b" }}>
+            MIT © Ernest Keyz Studios
+          </p>
         </div>
       </div>
     </div>

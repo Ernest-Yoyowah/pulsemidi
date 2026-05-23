@@ -8,36 +8,37 @@ PulseMIDI is an open-source MIDI toolkit that ships in three forms: a **Tauri st
 
 ## Features
 
-| Feature | Description |
-|---|---|
-| **88-Key Piano** | Full A0–C8 visualiser. Keys light up with velocity-proportional glow; colour is user-configurable. |
-| **Chord Detection** | Real-time detection of triads, 7ths, 9ths, 11ths, 13ths and slash chords. |
+| Feature                | Description                                                                                                     |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **88-Key Piano**       | Full A0–C8 visualiser. Keys light up with velocity-proportional glow; colour is user-configurable.              |
+| **Chord Detection**    | Real-time detection of triads, 7ths, 9ths, 11ths, 13ths and slash chords.                                       |
 | **Pitch & Mod Wheels** | Bidirectional pitch wheel (cyan = up, amber = down) and modulation bar that mirror a physical keyboard exactly. |
-| **CC Sliders & Knobs** | Two switchable views for MIDI controllers: a horizontal bar list and a rotary knob grid. |
-| **Live BPM** | Derived from MIDI clock ticks; displayed in real time in both standalone and VST. |
-| **Sustain Pedal Icon** | A pedal icon (standalone) or `⊙ SUS` badge (VST) appears while CC 64 is held. |
-| **MIDI Monitor** | Scrolling log of every MIDI message — pause/resume without dropping events. |
-| **Diagnostics** | Stuck-note detection (>8 s), CC flood alerts, inter-event latency readout. |
-| **Device Manager** | Lists all CoreMIDI input ports. Connect to all at once or select a single port. |
-| **Settings** | Configurable active-key colour via in-app colour picker. |
+| **CC Sliders & Knobs** | Two switchable views for MIDI controllers: a horizontal bar list and a rotary knob grid.                        |
+| **Live BPM**           | Derived from MIDI clock ticks; displayed in real time in both standalone and VST.                               |
+| **Sustain Pedal Icon** | A pedal icon (standalone) or `⊙ SUS` badge (VST) appears while CC 64 is held.                                   |
+| **MIDI Monitor**       | Scrolling log of every MIDI message — pause/resume without dropping events.                                     |
+| **Diagnostics**        | Stuck-note detection (>8 s), CC flood alerts, inter-event latency readout.                                      |
+| **Device Manager**     | Lists all CoreMIDI input ports. Connect to all at once or select a single port.                                 |
+| **Settings**           | Configurable active-key colour via in-app colour picker.                                                        |
 
 ---
 
 ## Formats & Platform Support
 
-| Format | Host / Runtime |
-|---|---|
-| **VST3** | Ableton Live, Logic Pro, Reaper, Cubase, Studio One, Bitwig… |
-| **CLAP** | Bitwig Studio, Reaper, and other CLAP-compatible hosts |
-| **Standalone** | macOS desktop app (Tauri v2 + WebKit) |
+| Format         | Host / Runtime                                               |
+| -------------- | ------------------------------------------------------------ |
+| **VST3**       | Ableton Live, Logic Pro, Reaper, Cubase, Studio One, Bitwig… |
+| **CLAP**       | Bitwig Studio, Reaper, and other CLAP-compatible hosts       |
+| **Standalone** | macOS desktop app (Tauri v2 + WebKit)                        |
 
-> **Platform:** macOS 12 Monterey or later (Intel x86\_64 & Apple Silicon). Linux/Windows support is on the roadmap via `midir`'s cross-platform backend.
+> **Platform:** macOS 12 Monterey or later (Intel x86_64 & Apple Silicon). Linux/Windows support is on the roadmap via `midir`'s cross-platform backend.
 
 ---
 
 ## Tech Stack
 
 ### Standalone app
+
 - **[Tauri v2](https://tauri.app/)** — native macOS shell (WKWebView + Rust core)
 - **[Rust](https://www.rust-lang.org/) + [midir](https://github.com/Boddlnagg/midir)** — CoreMIDI access, zero-copy event streaming
 - **[React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)** — frontend UI
@@ -46,6 +47,7 @@ PulseMIDI is an open-source MIDI toolkit that ships in three forms: a **Tauri st
 - **[Vite 7](https://vitejs.dev/)** — frontend build tooling
 
 ### VST3 / CLAP plugin
+
 - **[nih-plug](https://github.com/robbert-vdh/nih-plug)** — Rust VST3 + CLAP plugin framework
 - **[nih-plug-vizia](https://github.com/robbert-vdh/nih-plug)** — Vizia-based GPU-accelerated GUI
 - **femtovg** — canvas rendering for piano keys and pitch/mod wheels
@@ -55,12 +57,12 @@ PulseMIDI is an open-source MIDI toolkit that ships in three forms: a **Tauri st
 
 ## Prerequisites
 
-| Tool | Version |
-|---|---|
-| Rust (stable) | ≥ 1.75 |
-| Node.js | ≥ 20 |
-| npm | ≥ 10 |
-| macOS | 12 Monterey or later |
+| Tool          | Version              |
+| ------------- | -------------------- |
+| Rust (stable) | ≥ 1.75               |
+| Node.js       | ≥ 20                 |
+| npm           | ≥ 10                 |
+| macOS         | 12 Monterey or later |
 
 ---
 
@@ -177,5 +179,3 @@ Created by **Ernest Keyz** / **Ernest Keyz Studios**.
 ## License
 
 MIT © Ernest Keyz Studios
-
-

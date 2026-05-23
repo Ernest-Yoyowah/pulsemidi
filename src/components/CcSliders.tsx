@@ -101,19 +101,41 @@ function CcKnob({ cc, value }: { cc: number; value: number }) {
 
   // Indicator tick
   const tickInner = polar(valueDeg);
-  const tickInnerR = { x: cx + (R - 6) * Math.cos(((valueDeg - 90) * Math.PI) / 180), y: cy + (R - 6) * Math.sin(((valueDeg - 90) * Math.PI) / 180) };
+  const tickInnerR = {
+    x: cx + (R - 6) * Math.cos(((valueDeg - 90) * Math.PI) / 180),
+    y: cy + (R - 6) * Math.sin(((valueDeg - 90) * Math.PI) / 180),
+  };
 
   return (
     <div className="cc-knob-cell">
       <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
         {/* Track */}
-        <path d={trackD} fill="none" stroke="#27272a" strokeWidth="3" strokeLinecap="round" />
+        <path
+          d={trackD}
+          fill="none"
+          stroke="#27272a"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
         {/* Fill */}
         {fillD && (
-          <path d={fillD} fill="none" stroke="#22d3ee" strokeWidth="3" strokeLinecap="round" />
+          <path
+            d={fillD}
+            fill="none"
+            stroke="#22d3ee"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
         )}
         {/* Center dot */}
-        <circle cx={cx} cy={cy} r="3" fill="#1a1a1f" stroke="#3f3f46" strokeWidth="1" />
+        <circle
+          cx={cx}
+          cy={cy}
+          r="3"
+          fill="#1a1a1f"
+          stroke="#3f3f46"
+          strokeWidth="1"
+        />
         {/* Indicator */}
         <line
           x1={tickInnerR.x.toFixed(2)}
@@ -126,14 +148,16 @@ function CcKnob({ cc, value }: { cc: number; value: number }) {
         />
       </svg>
       <span className="cc-knob-value">{value}</span>
-      <span className="cc-knob-name">CC{cc} {name}</span>
+      <span className="cc-knob-name">
+        CC{cc} {name}
+      </span>
     </div>
   );
 }
 
 export default function CcSliders() {
   const ccValues = useMidiStore((s) => s.ccValues);
-  const [viewMode, setViewMode] = useState<'sliders' | 'knobs'>('sliders');
+  const [viewMode, setViewMode] = useState<"sliders" | "knobs">("sliders");
 
   const entries = Array.from(ccValues.entries()).sort((a, b) => a[0] - b[0]);
 
@@ -143,15 +167,15 @@ export default function CcSliders() {
         <h2 className="section-title">Controllers</h2>
         <div className="view-toggle">
           <button
-            className={`view-toggle__btn ${viewMode === 'sliders' ? 'view-toggle__btn--active' : ''}`}
-            onClick={() => setViewMode('sliders')}
+            className={`view-toggle__btn ${viewMode === "sliders" ? "view-toggle__btn--active" : ""}`}
+            onClick={() => setViewMode("sliders")}
             title="Slider view"
           >
             &#9776;
           </button>
           <button
-            className={`view-toggle__btn ${viewMode === 'knobs' ? 'view-toggle__btn--active' : ''}`}
-            onClick={() => setViewMode('knobs')}
+            className={`view-toggle__btn ${viewMode === "knobs" ? "view-toggle__btn--active" : ""}`}
+            onClick={() => setViewMode("knobs")}
             title="Knob view"
           >
             &#9711;
@@ -167,7 +191,7 @@ export default function CcSliders() {
             to see live values
           </p>
         </div>
-      ) : viewMode === 'knobs' ? (
+      ) : viewMode === "knobs" ? (
         <div className="cc-knob-grid overflow-y-auto flex-1 min-h-0 scrollbar-thin pr-0.5 pt-1">
           {entries.map(([cc, value]) => (
             <CcKnob key={cc} cc={cc} value={value} />

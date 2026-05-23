@@ -16,7 +16,7 @@ function activeKeyStyle(
   color: string,
 ): React.CSSProperties {
   const v = velocity / 127;
-  const opacity = isBlack ? 0.65 + v * 0.35 : 0.60 + v * 0.40;
+  const opacity = isBlack ? 0.65 + v * 0.35 : 0.6 + v * 0.4;
   const glow = Math.round(8 + v * 12);
   return {
     background: hexToRgba(color, opacity),
@@ -95,7 +95,11 @@ export default function PianoKeyboard() {
                 className="w-full h-full rounded-b-sm transition-colors duration-75"
                 style={
                   active
-                    ? activeKeyStyle(event?.velocity ?? 80, false, activeKeyColor)
+                    ? activeKeyStyle(
+                        event?.velocity ?? 80,
+                        false,
+                        activeKeyColor,
+                      )
                     : { background: "#e8e8e8" }
                 }
               />
@@ -125,7 +129,11 @@ export default function PianoKeyboard() {
                 className="w-full h-full rounded-b-sm transition-all duration-75"
                 style={
                   active
-                    ? activeKeyStyle(event?.velocity ?? 80, true, activeKeyColor)
+                    ? activeKeyStyle(
+                        event?.velocity ?? 80,
+                        true,
+                        activeKeyColor,
+                      )
                     : { background: "#1a1a1a" }
                 }
               />
@@ -143,7 +151,9 @@ export default function PianoKeyboard() {
             </span>
           )}
         </div>
-        <span className="text-zinc-700 font-mono tracking-wide">Ernest Keyz Studios</span>
+        <span className="text-zinc-700 font-mono tracking-wide">
+          Ernest Keyz Studios
+        </span>
       </div>
     </div>
   );
