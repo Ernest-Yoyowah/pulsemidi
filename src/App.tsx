@@ -187,7 +187,7 @@ function App() {
       mounted = false;
       midiService.dispose();
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="app-shell">
@@ -204,7 +204,6 @@ function App() {
           </span>
         </div>
 
-        {/* ── Mode toggle: prominent segmented control ── */}
         <div className="mode-toggle">
           <button
             className={`mode-toggle__btn ${mode === "monitor" ? "mode-toggle__btn--monitor-active" : ""}`}

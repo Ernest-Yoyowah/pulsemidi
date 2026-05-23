@@ -2,9 +2,7 @@ import { useState } from "react";
 import { useMidiStore } from "../store/midiStore";
 import { getCcName } from "../utils/noteUtils";
 
-// CCs that behave as boolean on/off switches
 const BOOL_CCS = new Set([64, 65, 66, 67, 68, 69]);
-// CCs where center (64) = neutral, displayed as a bidirectional bar
 const CENTER_CCS = new Set([10, 8]);
 
 function CcRow({ cc, value }: { cc: number; value: number }) {
@@ -51,11 +49,9 @@ function CcRow({ cc, value }: { cc: number; value: number }) {
               }}
             />
           )}
-          {/* Center tick */}
           <div className="absolute inset-y-0 left-1/2 w-px bg-zinc-600 pointer-events-none" />
         </div>
       ) : (
-        /* Standard 0–127 bar */
         <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
           <div
             className="h-full bg-cyan-500 rounded-full transition-all duration-[16ms]"
@@ -67,7 +63,6 @@ function CcRow({ cc, value }: { cc: number; value: number }) {
   );
 }
 
-// SVG rotary knob (≃270° arc, 7 o’clock to 5 o’clock)
 function CcKnob({ cc, value }: { cc: number; value: number }) {
   const name = getCcName(cc);
   const isBool = BOOL_CCS.has(cc);
@@ -77,10 +72,10 @@ function CcKnob({ cc, value }: { cc: number; value: number }) {
   const cx = SIZE / 2;
   const cy = SIZE / 2;
   const R = 16;
-  const GAP_DEG = 90; // gap at bottom
-  const ARC_DEG = 360 - GAP_DEG; // 270°
-  const START_DEG = 90 + GAP_DEG / 2; // 135° (7 o’clock)
-  const END_DEG = START_DEG + ARC_DEG; // 405° = 45° (5 o’clock)
+  const GAP_DEG = 90;
+  const ARC_DEG = 360 - GAP_DEG;
+  const START_DEG = 90 + GAP_DEG / 2;
+  const END_DEG = START_DEG + ARC_DEG;
 
   function polar(angleDeg: number) {
     const rad = ((angleDeg - 90) * Math.PI) / 180;
@@ -99,7 +94,6 @@ function CcKnob({ cc, value }: { cc: number; value: number }) {
       ? `M${startPt.x.toFixed(2)},${startPt.y.toFixed(2)} A${R},${R} 0 ${largeArc},1 ${valuePt.x.toFixed(2)},${valuePt.y.toFixed(2)}`
       : null;
 
-  // Indicator tick
   const tickInner = polar(valueDeg);
   const tickInnerR = {
     x: cx + (R - 6) * Math.cos(((valueDeg - 90) * Math.PI) / 180),
@@ -109,7 +103,6 @@ function CcKnob({ cc, value }: { cc: number; value: number }) {
   return (
     <div className="cc-knob-cell">
       <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
-        {/* Track */}
         <path
           d={trackD}
           fill="none"
@@ -117,7 +110,6 @@ function CcKnob({ cc, value }: { cc: number; value: number }) {
           strokeWidth="3"
           strokeLinecap="round"
         />
-        {/* Fill */}
         {fillD && (
           <path
             d={fillD}
@@ -127,7 +119,6 @@ function CcKnob({ cc, value }: { cc: number; value: number }) {
             strokeLinecap="round"
           />
         )}
-        {/* Center dot */}
         <circle
           cx={cx}
           cy={cy}
@@ -136,7 +127,6 @@ function CcKnob({ cc, value }: { cc: number; value: number }) {
           stroke="#3f3f46"
           strokeWidth="1"
         />
-        {/* Indicator */}
         <line
           x1={tickInnerR.x.toFixed(2)}
           y1={tickInnerR.y.toFixed(2)}

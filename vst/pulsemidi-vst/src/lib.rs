@@ -10,11 +10,13 @@ pub mod midi_utils;
 use midi_utils::cc_name;
 
 pub struct AtomicPluginState {
-    pub notes_lo: AtomicU64, 
-    pub notes_hi: AtomicU64, 
+    pub notes_lo: AtomicU64,
+    pub notes_hi: AtomicU64,
+    pub note_velocities: [AtomicU8; 128],
     pub pitch_bend: AtomicI32,
     pub bpm_raw: AtomicU32,
     pub cc: [AtomicU8; 128],
+    pub key_color_idx: AtomicU8,
 }
 
 impl AtomicPluginState {
@@ -22,14 +24,17 @@ impl AtomicPluginState {
         Arc::new(Self {
             notes_lo: AtomicU64::new(0),
             notes_hi: AtomicU64::new(0),
+            note_velocities: std::array::from_fn(|_| AtomicU8::new(0)),
             pitch_bend: AtomicI32::new(0),
             bpm_raw: AtomicU32::new(0),
             cc: std::array::from_fn(|_| AtomicU8::new(0)),
+            key_color_idx: AtomicU8::new(0),
         })
     }
 
     #[inline]
-    pub fn set_note_on(&self, note: u8) {
+    pub fn set_note_on(&self, note: u8, velocity: u8) {
+        self.note_velocities[note as usize].store(velocity, Ordering::Relaxed);
         if note < 64 {
             self.notes_lo.fetch_or(1u64 << note, Ordering::Relaxed);
         } else {
@@ -39,6 +44,7 @@ impl AtomicPluginState {
 
     #[inline]
     pub fn set_note_off(&self, note: u8) {
+        self.note_velocities[note as usize].store(0, Ordering::Relaxed);
         if note < 64 {
             self.notes_lo.fetch_and(!(1u64 << note), Ordering::Relaxed);
         } else {
@@ -68,6 +74,13 @@ impl AtomicPluginState {
             }
         }
         notes
+    }
+
+    pub fn get_active_note_states(&self) -> Vec<(u8, u8)> {
+        self.get_active_notes()
+            .into_iter()
+            .map(|n| (n, self.note_velocities[n as usize].load(Ordering::Relaxed)))
+            .collect()
     }
 
     pub fn interesting_ccs(&self) -> Vec<(String, f32)> {
@@ -168,8 +181,9 @@ impl Plugin for PulseMidi {
 
         while let Some(event) = context.next_event() {
             match event {
-                NoteEvent::NoteOn { note, .. } => {
-                    self.state.set_note_on(note);
+                NoteEvent::NoteOn { note, velocity, .. } => {
+                    let vel = (velocity * 127.0).round() as u8;
+                    self.state.set_note_on(note, vel);
                 }
                 NoteEvent::NoteOff { note, .. } => {
                     self.state.set_note_off(note);

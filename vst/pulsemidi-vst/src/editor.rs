@@ -118,7 +118,24 @@ const STYLE: &str = r#"
     padding-left: 10px;
     padding-right: 10px;
 }
+.color-btn {
+    width: 14px;
+    height: 14px;
+    border-radius: 7px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
 "#;
+
+const KEY_COLORS: &[(u8, u8, u8)] = &[
+    (34, 211, 238),
+    (167, 139, 250),
+    (52, 211, 153),
+    (251, 191, 36),
+    (248, 113, 113),
+    (96, 165, 250),
+    (249, 168, 212),
+    (163, 230, 53),
+];
 
 #[derive(Lens, Clone)]
 struct UiModel {
@@ -128,7 +145,8 @@ struct UiModel {
     pitch_pct: f32,
     mod_pct: f32,
     right_bars: Vec<(String, f32)>,
-    active_note_numbers: Vec<u8>,
+    piano_states: Vec<(u8, u8)>,
+    key_color_idx: u8,
     sustain: bool,
     plugin_state: Arc<AtomicPluginState>,
 }
@@ -136,6 +154,7 @@ struct UiModel {
 #[derive(Debug)]
 enum UiEvent {
     Tick,
+    CycleColor,
 }
 
 impl Model for UiModel {
@@ -151,7 +170,7 @@ impl Model for UiModel {
                 };
 
                 self.notes = active.iter().map(|&n| note_name(n)).collect();
-                self.active_note_numbers = active;
+                self.piano_states = self.plugin_state.get_active_note_states();
 
                 let bpm = self.plugin_state.bpm_raw.load(Ordering::Relaxed);
                 self.bpm_text = if bpm > 0 {
@@ -170,6 +189,13 @@ impl Model for UiModel {
 
                 let sus = self.plugin_state.cc[64].load(Ordering::Relaxed);
                 self.sustain = sus >= 64;
+
+                self.key_color_idx = self.plugin_state.key_color_idx.load(Ordering::Relaxed);
+            }
+            UiEvent::CycleColor => {
+                let next = (self.key_color_idx + 1) % KEY_COLORS.len() as u8;
+                self.key_color_idx = next;
+                self.plugin_state.key_color_idx.store(next, Ordering::Relaxed);
             }
         });
     }
@@ -192,7 +218,8 @@ pub fn create(
                 pitch_pct: 0.0,
                 mod_pct: 0.0,
                 right_bars: Vec::new(),
-                active_note_numbers: Vec::new(),
+                piano_states: Vec::new(),
+                key_color_idx: 0,
                 sustain: false,
                 plugin_state: plugin_state.clone(),
             }
@@ -227,6 +254,15 @@ pub fn create(
                         if !text.is_empty() {
                             Label::new(cx, &text).class("bpm-text");
                         }
+                    });
+
+                    Binding::new(cx, UiModel::key_color_idx, |cx, lens| {
+                        let idx = lens.get(cx) as usize;
+                        let (kr, kg, kb) = KEY_COLORS[idx % KEY_COLORS.len()];
+                        Element::new(cx)
+                            .on_mouse_down(|cx, _| cx.emit(UiEvent::CycleColor))
+                            .class("color-btn")
+                            .background_color(Color::rgb(kr, kg, kb));
                     });
                 })
                 .class("topbar");
@@ -280,11 +316,15 @@ pub fn create(
                 })
                 .class("stage");
 
-                Binding::new(cx, UiModel::active_note_numbers, |cx, lens| {
-                    let active = lens.get(cx);
-                    PianoKeys { active }.build(cx, |_| {})
-                        .width(Pixels(WINDOW_WIDTH as f32))
-                        .height(Pixels(KEYBOARD_HEIGHT));
+                Binding::new(cx, UiModel::key_color_idx, |cx, color_lens| {
+                    let color_idx = color_lens.get(cx);
+                    Binding::new(cx, UiModel::piano_states, move |cx, states_lens| {
+                        let states = states_lens.get(cx);
+                        PianoKeys { states, color_idx }
+                            .build(cx, |_| {})
+                            .width(Pixels(WINDOW_WIDTH as f32))
+                            .height(Pixels(KEYBOARD_HEIGHT));
+                    });
                 });
             })
             .width(Pixels(WINDOW_WIDTH as f32))
@@ -297,14 +337,15 @@ pub fn create(
 
 
 const PIANO_START: u8 = 21;
-const PIANO_END: u8 = 108; 
+const PIANO_END: u8 = 108;
 
 fn is_black_key(note: u8) -> bool {
     matches!(note % 12, 1 | 3 | 6 | 8 | 10)
 }
 
 struct PianoKeys {
-    active: Vec<u8>,
+    states: Vec<(u8, u8)>,
+    color_idx: u8,
 }
 
 impl View for PianoKeys {
@@ -320,27 +361,29 @@ impl View for PianoKeys {
         let bw = ww * 0.58;
         let bh = wh * 0.62;
 
+        let (kr, kg, kb) = KEY_COLORS[self.color_idx as usize % KEY_COLORS.len()];
+        let active_map: std::collections::HashMap<u8, u8> =
+            self.states.iter().cloned().collect();
 
         for (i, &note) in white_keys.iter().enumerate() {
             let x = bounds.x + i as f32 * ww;
-            let active = self.active.contains(&note);
-
-            let fill = if active {
-                vg::Color::rgba(34, 211, 238, 210)
+            let fill = if let Some(&vel) = active_map.get(&note) {
+                let v = vel as f32 / 127.0;
+                let alpha = ((0.6 + v * 0.4) * 255.0) as u8;
+                vg::Color::rgba(kr, kg, kb, alpha)
             } else {
                 vg::Color::rgb(200, 200, 208)
             };
-            let mut path = vg::Path::new();
-            path.rect(x + 0.5, bounds.y + 0.5, ww - 1.5, wh - 1.0);
-            canvas.fill_path(&path, &vg::Paint::color(fill));
+            let mut fill_path = vg::Path::new();
+            fill_path.rect(x + 0.5, bounds.y + 0.5, ww - 1.5, wh - 1.0);
+            canvas.fill_path(&fill_path, &vg::Paint::color(fill));
 
             let mut border = vg::Paint::color(vg::Color::rgb(60, 60, 75));
             border.set_line_width(1.0);
-            let mut path = vg::Path::new();
-            path.rect(x + 0.5, bounds.y + 0.5, ww - 1.5, wh - 1.0);
-            canvas.stroke_path(&path, &border);
+            let mut border_path = vg::Path::new();
+            border_path.rect(x + 0.5, bounds.y + 0.5, ww - 1.5, wh - 1.0);
+            canvas.stroke_path(&border_path, &border);
         }
-
 
         for (i, &note) in white_keys.iter().enumerate() {
             let black = note + 1;
@@ -348,10 +391,10 @@ impl View for PianoKeys {
                 continue;
             }
             let bx = bounds.x + (i as f32 + 1.0) * ww - bw / 2.0;
-            let active = self.active.contains(&black);
-
-            let fill = if active {
-                vg::Color::rgba(34, 211, 238, 220)
+            let fill = if let Some(&vel) = active_map.get(&black) {
+                let v = vel as f32 / 127.0;
+                let alpha = ((0.65 + v * 0.35) * 255.0) as u8;
+                vg::Color::rgba(kr, kg, kb, alpha)
             } else {
                 vg::Color::rgb(18, 18, 26)
             };
@@ -376,7 +419,6 @@ impl View for WheelCanvas {
         let h = b.h;
         let r = (w / 2.0).min(11.0);
 
-        // Background
         let mut bg = vg::Path::new();
         bg.rounded_rect(x, y, w, h, r);
         canvas.fill_path(&bg, &vg::Paint::color(vg::Color::rgba(14, 14, 20, 255)));
@@ -385,8 +427,6 @@ impl View for WheelCanvas {
             let abs_pct = self.pct.abs().clamp(0.0, 1.0);
             if abs_pct > 0.02 {
                 let fill_h = abs_pct * h / 2.0;
-                // Positive = wheel pushed UP → fill ABOVE center line
-                // Negative = wheel pushed DOWN → fill BELOW center line
                 let fill_y = if self.pct > 0.0 {
                     y + h / 2.0 - fill_h
                 } else {
@@ -401,7 +441,6 @@ impl View for WheelCanvas {
                 fp.rect(x + 1.0, fill_y, w - 2.0, fill_h);
                 canvas.fill_path(&fp, &vg::Paint::color(color));
             }
-            // Center line
             let mut cp = vg::Path::new();
             cp.rect(x, y + h / 2.0 - 0.5, w, 1.0);
             canvas.fill_path(&cp, &vg::Paint::color(vg::Color::rgba(255, 255, 255, 38)));
@@ -415,7 +454,6 @@ impl View for WheelCanvas {
             }
         }
 
-        // Border overlay
         let mut bp = vg::Paint::color(vg::Color::rgba(32, 32, 40, 200));
         bp.set_line_width(1.0);
         let mut bpath = vg::Path::new();

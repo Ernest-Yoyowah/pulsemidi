@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# preinstall — PulseMIDI macOS Installer (runs before files are copied)
+# Removes any previous PulseMIDI installation so the upgrade is clean.
+
+# Standalone app
+if [ -d "/Applications/PulseMIDI.app" ]; then
+  rm -rf "/Applications/PulseMIDI.app"
+fi
+
+# VST3 plugin
+if [ -d "/Library/Audio/Plug-Ins/VST3/pulsemidi-vst.vst3" ]; then
+  rm -rf "/Library/Audio/Plug-Ins/VST3/pulsemidi-vst.vst3"
+fi
+
+# CLAP plugin
+if [ -d "/Library/Audio/Plug-Ins/CLAP/pulsemidi-vst.clap" ]; then
+  rm -rf "/Library/Audio/Plug-Ins/CLAP/pulsemidi-vst.clap"
+fi
+
+# Ensure plugin directories exist
+mkdir -p "/Library/Audio/Plug-Ins/VST3"
+mkdir -p "/Library/Audio/Plug-Ins/CLAP"
+
+exit 0

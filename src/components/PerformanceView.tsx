@@ -98,7 +98,6 @@ export default function PerformanceView() {
   const noteNames = noteNumbers.map((n) => midiNoteToName(n));
   const chord = useMemo(
     () => detectChord(noteNumbers),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [noteNumbers.join(",")],
   );
 

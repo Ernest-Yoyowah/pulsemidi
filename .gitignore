@@ -14,6 +14,9 @@ dist-ssr
 src-tauri/target/
 vst/target/
 
+_staging/
+_pkgwork/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
