@@ -1,19 +1,4 @@
 #!/usr/bin/env bash
-# =============================================================================
-# create-installer.sh — PulseMIDI macOS GUI Installer Builder
-# Ernest Keyz Studios
-#
-# Packages the staged binaries (from build-universal.sh) into a standard
-# macOS .pkg installer with a full GUI wizard:
-#   Welcome → License → Installation → Progress → Conclusion
-#
-# The installer places:
-#   • PulseMIDI.app          → /Applications/
-#   • pulsemidi-vst.vst3     → /Library/Audio/Plug-Ins/VST3/
-#   • pulsemidi-vst.clap     → /Library/Audio/Plug-Ins/CLAP/
-#
-# Output: ../../dist/PulseMIDI-1.1.0-macOS.pkg
-# =============================================================================
 
 set -euo pipefail
 
@@ -37,7 +22,6 @@ echo "║  Ernest Keyz Studios — PulseMIDI Installer Build ║"
 echo "╚══════════════════════════════════════════════════╝"
 echo ""
 
-# ── Guard: staging must exist ───────────────────────────────────────────────
 
 if [ ! -d "$STAGING/Applications/PulseMIDI.app" ]; then
   echo "❌  Staging directory not found."
@@ -45,15 +29,17 @@ if [ ! -d "$STAGING/Applications/PulseMIDI.app" ]; then
   exit 1
 fi
 
-# ── Setup working dirs ───────────────────────────────────────────────────────
-
 rm -rf "$PKG_WORK"
 mkdir -p "$PKG_WORK/components" "$DIST"
 
-# Make scripts executable
 chmod +x "$SCRIPTS/preinstall" "$SCRIPTS/postinstall"
 
-# ── Build component packages ─────────────────────────────────────────────────
+info "Compiling Uninstall PulseMIDI.app…"
+UNINSTALLER_SRC="$RESOURCES/Uninstall PulseMIDI.applescript"
+UNINSTALLER_APP="$STAGING/Applications/Uninstall PulseMIDI.app"
+rm -rf "$UNINSTALLER_APP"
+osacompile -o "$UNINSTALLER_APP" "$UNINSTALLER_SRC"
+ok "Uninstaller app compiled"
 
 info "Building component: PulseMIDI.app (standalone)…"
 pkgbuild \
@@ -82,8 +68,6 @@ pkgbuild \
 
 ok "Component packages built"
 
-# ── Assemble product installer ───────────────────────────────────────────────
-
 FINAL_PKG="$DIST/PulseMIDI-${APP_VERSION}-macOS.pkg"
 
 info "Assembling final installer → $FINAL_PKG"
@@ -92,8 +76,6 @@ productbuild \
   --resources "$RESOURCES" \
   --package-path "$PKG_WORK/components" \
   "$FINAL_PKG"
-
-# ── Summary ─────────────────────────────────────────────────────────────────
 
 echo ""
 ok "Installer created:"
