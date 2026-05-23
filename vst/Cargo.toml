@@ -1,0 +1,12 @@
+[workspace]
+members = ["pulsemidi-vst", "xtask"]
+resolver = "2"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = "symbols"
+opt-level = 3
+
+[profile.dev]
+opt-level = 1

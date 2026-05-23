@@ -1,0 +1,14 @@
+[package]
+name = "pulsemidi-vst"
+version = "0.1.0"
+edition = "2021"
+description = "PulseMIDI VST3/CLAP plugin"
+homepage = "https://github.com/Ernest-Yoyowah/pulsemidi"
+
+[lib]
+name = "pulsemidi_vst"
+crate-type = ["cdylib"]
+
+[dependencies]
+nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = ["assert_process_allocs"] }
+nih_plug_vizia = { git = "https://github.com/robbert-vdh/nih-plug.git" }

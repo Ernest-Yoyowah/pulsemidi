@@ -56,11 +56,67 @@ body,
     @apply flex items-baseline gap-0;
   }
 
-  .header-badge {
-    @apply text-[9px] font-bold tracking-[0.2em] uppercase rounded px-1.5 py-0.5;
-    background: rgba(6, 182, 212, 0.1);
-    color: #22d3ee;
-    border: 1px solid rgba(6, 182, 212, 0.2);
+  .mode-toggle {
+    @apply flex items-center;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .mode-toggle__btn {
+    @apply flex items-center gap-2 cursor-pointer select-none;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 7px;
+    color: #3f3f46;
+    transition: all 180ms ease;
+  }
+
+  .mode-toggle__btn:hover {
+    color: #71717a;
+  }
+
+  .mode-toggle__dot {
+    @apply inline-block rounded-full flex-shrink-0;
+    width: 6px;
+    height: 6px;
+    background: currentColor;
+    transition: all 180ms ease;
+  }
+
+  .mode-toggle__btn--monitor-active {
+    background: rgba(63, 63, 70, 0.5);
+    color: #a1a1aa;
+  }
+
+  .mode-toggle__btn--live-opt:hover {
+    color: #fca5a5;
+  }
+
+  .mode-toggle__btn--live-active {
+    background: rgba(239, 68, 68, 0.18);
+    color: #f87171;
+  }
+
+  .mode-toggle__btn--live-active .mode-toggle__dot {
+    animation: live-dot-pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes live-dot-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.4;
+      transform: scale(0.7);
+    }
   }
 
   .device-item {
@@ -277,5 +333,388 @@ body,
 
   .cc-slider-row:hover {
     border-color: rgba(63, 63, 70, 0.8);
+  }
+
+  .perf-shell {
+    @apply flex flex-col h-full;
+    background: radial-gradient(ellipse at 50% 35%, #0e0e18 0%, #06060a 65%);
+  }
+
+  .perf-topbar {
+    @apply flex items-center justify-between px-6 py-3 flex-shrink-0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .perf-device-label {
+    @apply text-[10px] font-mono uppercase tracking-widest;
+    color: #3f3f46;
+  }
+
+  .perf-bpm-block {
+    @apply flex items-baseline gap-1.5;
+  }
+
+  .perf-bpm-value {
+    @apply text-4xl font-black tabular-nums;
+    color: #fbbf24;
+    text-shadow: 0 0 24px rgba(251, 191, 36, 0.5);
+    line-height: 1;
+  }
+
+  .perf-bpm-unit {
+    @apply text-[10px] font-bold tracking-widest uppercase;
+    color: #78350f;
+  }
+
+  .perf-bpm-off {
+    @apply text-xs font-mono;
+    color: #27272a;
+  }
+
+  .perf-sustain-icon {
+    display: flex;
+    align-items: center;
+    opacity: 0.9;
+    animation: sustain-pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes sustain-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.55;
+    }
+  }
+
+  .perf-stage {
+    @apply flex flex-1 min-h-0 items-stretch;
+  }
+
+  .perf-wheels-group {
+    @apply flex items-center justify-center gap-3 px-5 py-6 flex-shrink-0;
+    width: 110px;
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .perf-wheels-group:last-child {
+    border-right: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .perf-wheel-col {
+    @apply flex flex-col items-center gap-2;
+  }
+
+  .perf-wheel-track {
+    position: relative;
+    width: 22px;
+    height: 160px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 11px;
+    overflow: hidden;
+  }
+
+  .perf-wheel-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-radius: 11px;
+    transition: height 16ms linear;
+  }
+
+  .perf-wheel-center {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-50%);
+  }
+
+  .perf-wheel-label {
+    @apply text-[9px] font-bold tracking-widest uppercase;
+    color: #3f3f46;
+  }
+
+  .perf-center {
+    @apply flex flex-col items-center justify-center flex-1 gap-5 px-4;
+    min-width: 0;
+  }
+
+  .perf-standby {
+    @apply flex flex-col items-center gap-4;
+  }
+
+  .perf-standby-ring {
+    @apply block rounded-full;
+    width: 72px;
+    height: 72px;
+    border: 2px solid rgba(255, 255, 255, 0.06);
+    animation: standby-breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes standby-breathe {
+    0%,
+    100% {
+      border-color: rgba(255, 255, 255, 0.04);
+      transform: scale(1);
+    }
+    50% {
+      border-color: rgba(34, 211, 238, 0.15);
+      transform: scale(1.08);
+    }
+  }
+
+  .perf-standby-label {
+    @apply text-[10px] font-mono tracking-[0.3em] uppercase;
+    color: #27272a;
+  }
+
+  .perf-chord-display {
+    @apply flex items-end justify-center leading-none;
+    gap: 0.05em;
+  }
+
+  .perf-chord-root {
+    font-size: clamp(5rem, 14vw, 9.5rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: #f4f4f5;
+    line-height: 1;
+    text-shadow:
+      0 0 80px rgba(34, 211, 238, 0.2),
+      0 0 160px rgba(34, 211, 238, 0.08);
+  }
+
+  .perf-chord-root--cluster {
+    font-size: clamp(2rem, 6vw, 4.5rem);
+    color: #a1a1aa;
+    text-shadow: none;
+    letter-spacing: 0.05em;
+    word-spacing: 0.2em;
+  }
+
+  .perf-chord-quality {
+    font-size: clamp(2.2rem, 5.5vw, 4rem);
+    font-weight: 700;
+    color: #22d3ee;
+    line-height: 1;
+    padding-bottom: 0.12em;
+    text-shadow:
+      0 0 24px rgba(34, 211, 238, 0.6),
+      0 0 60px rgba(34, 211, 238, 0.25);
+  }
+
+  .perf-notes-row {
+    @apply flex items-center justify-center flex-wrap;
+    gap: 10px;
+  }
+
+  .perf-note-chip {
+    @apply font-mono font-semibold tabular-nums;
+    font-size: clamp(0.8rem, 1.6vw, 1.1rem);
+    padding: 0.25em 0.8em;
+    border-radius: 6px;
+    background: rgba(34, 211, 238, 0.06);
+    color: #67e8f9;
+    border: 1px solid rgba(34, 211, 238, 0.15);
+    letter-spacing: 0.04em;
+  }
+
+  .perf-piano-strip {
+    @apply flex-shrink-0 px-4 pb-4 pt-1;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  /* ── Knob view ─────────────────────────────────────────── */
+  .cc-knob-grid {
+    @apply grid gap-3;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  }
+
+  .cc-knob-cell {
+    @apply flex flex-col items-center gap-1;
+  }
+
+  .cc-knob-value {
+    @apply font-mono tabular-nums;
+    font-size: 10px;
+    color: #22d3ee;
+  }
+
+  .cc-knob-name {
+    font-size: 9px;
+    color: #52525b;
+    text-align: center;
+    max-width: 68px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .view-toggle {
+    @apply flex items-center gap-1;
+  }
+
+  .view-toggle__btn {
+    @apply rounded px-1.5 py-0.5 text-[10px] font-mono;
+    color: #52525b;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 80ms;
+  }
+
+  .view-toggle__btn--active {
+    color: #22d3ee;
+    background: rgba(34, 211, 238, 0.08);
+    border-color: rgba(34, 211, 238, 0.2);
+  }
+
+  /* ── Modal overlay ──────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  .modal-panel {
+    background: #111113;
+    border: 1px solid rgba(63, 63, 70, 0.6);
+    border-radius: 16px;
+    padding: 28px 32px;
+    min-width: 340px;
+    max-width: 480px;
+    width: 90vw;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: #52525b;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color 80ms;
+  }
+
+  .modal-close:hover {
+    color: #a1a1aa;
+  }
+
+  .modal-title {
+    @apply font-bold mb-5;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    color: #e4e4e7;
+    text-transform: uppercase;
+  }
+
+  .modal-row {
+    @apply flex items-center justify-between py-2.5;
+    border-bottom: 1px solid rgba(63, 63, 70, 0.25);
+  }
+
+  .modal-row:last-child {
+    border-bottom: none;
+  }
+
+  .modal-label {
+    font-size: 12px;
+    color: #a1a1aa;
+  }
+
+  .modal-section {
+    @apply mb-4;
+  }
+
+  .modal-section-title {
+    font-size: 10px;
+    color: #52525b;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .about-logo {
+    @apply flex items-center mb-6;
+    gap: 0;
+  }
+
+  .about-logo__pulse {
+    color: #22d3ee;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+
+  .about-logo__midi {
+    color: #71717a;
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+  }
+
+  .about-tag {
+    @apply ml-3 text-[10px] font-mono px-2 py-0.5 rounded;
+    color: #3f3f46;
+    background: rgba(63, 63, 70, 0.15);
+    border: 1px solid rgba(63, 63, 70, 0.3);
+  }
+
+  .about-feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .about-feature-list li {
+    font-size: 12px;
+    color: #71717a;
+    padding-left: 14px;
+    position: relative;
+  }
+
+  .about-feature-list li::before {
+    content: '\2022';
+    position: absolute;
+    left: 0;
+    color: #22d3ee;
+    opacity: 0.6;
+  }
+
+  .header-icon-btn {
+    background: transparent;
+    border: none;
+    color: #52525b;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1;
+    transition: color 80ms;
+  }
+
+  .header-icon-btn:hover {
+    color: #a1a1aa;
   }
 }

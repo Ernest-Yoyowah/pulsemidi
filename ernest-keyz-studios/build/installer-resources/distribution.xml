@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="2">
+
+  <!-- ── Product metadata ─────────────────────────────────── -->
+  <title>PulseMIDI 1.1.0</title>
+  <organization>com.ernestkeyzstudios.pulsemidi</organization>
+  <domains enable_localSystem="true" enable_currentUserHome="false"/>
+  <options customize="allow" require-scripts="true" rootVolumeOnly="true"
+           allow-external-scripts="false"/>
+
+  <!-- ── Installer UI resources ───────────────────────────── -->
+  <welcome    file="welcome.html"    mime-type="text/html"/>
+  <conclusion file="conclusion.html" mime-type="text/html"/>
+  <license    file="LICENSE"         mime-type="text/plain"/>
+
+  <!-- ── Background ───────────────────────────────────────── -->
+  <background file="background.png" alignment="bottomleft"
+              scaling="none" mime-type="image/png"/>
+
+  <!-- ── Component package references ─────────────────────── -->
+  <pkg-ref id="com.ernestkeyzstudios.pulsemidi.standalone" version="1.1.0"
+           onConclusion="none">standalone.pkg</pkg-ref>
+  <pkg-ref id="com.ernestkeyzstudios.pulsemidi.vst3"       version="1.1.0"
+           onConclusion="none">vst3.pkg</pkg-ref>
+  <pkg-ref id="com.ernestkeyzstudios.pulsemidi.clap"       version="1.1.0"
+           onConclusion="none">clap.pkg</pkg-ref>
+
+  <!-- ── Installation choices ─────────────────────────────── -->
+  <choices-outline>
+    <line choice="standalone"/>
+    <line choice="vst3"/>
+    <line choice="clap"/>
+  </choices-outline>
+
+  <choice id="standalone" title="PulseMIDI (Standalone App)"
+          description="The standalone PulseMIDI application. Installs to /Applications/PulseMIDI.app."
+          start_selected="true" start_enabled="true" start_visible="true">
+    <pkg-ref id="com.ernestkeyzstudios.pulsemidi.standalone"/>
+  </choice>
+
+  <choice id="vst3" title="VST3 Plugin"
+          description="The PulseMIDI VST3 plugin for use in DAWs such as Ableton Live, Logic Pro, FL Studio, and Reaper. Installs to /Library/Audio/Plug-Ins/VST3/."
+          start_selected="true" start_enabled="true" start_visible="true">
+    <pkg-ref id="com.ernestkeyzstudios.pulsemidi.vst3"/>
+  </choice>
+
+  <choice id="clap" title="CLAP Plugin"
+          description="The PulseMIDI CLAP plugin. A modern, open-source plugin format supported by Bitwig, Reaper, and others. Installs to /Library/Audio/Plug-Ins/CLAP/."
+          start_selected="true" start_enabled="true" start_visible="true">
+    <pkg-ref id="com.ernestkeyzstudios.pulsemidi.clap"/>
+  </choice>
+
+</installer-gui-script>

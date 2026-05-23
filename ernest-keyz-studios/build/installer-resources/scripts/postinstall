@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# postinstall — PulseMIDI macOS Installer (runs after files are copied)
+# Clears macOS quarantine flags so the app and plugins open without
+# "can't be opened because it is from an unidentified developer" warnings.
+
+# Clear quarantine on standalone app
+if [ -d "/Applications/PulseMIDI.app" ]; then
+  xattr -cr "/Applications/PulseMIDI.app" 2>/dev/null || true
+fi
+
+# Clear quarantine on VST3 plugin
+if [ -d "/Library/Audio/Plug-Ins/VST3/pulsemidi-vst.vst3" ]; then
+  xattr -cr "/Library/Audio/Plug-Ins/VST3/pulsemidi-vst.vst3" 2>/dev/null || true
+fi
+
+# Clear quarantine on CLAP plugin
+if [ -d "/Library/Audio/Plug-Ins/CLAP/pulsemidi-vst.clap" ]; then
+  xattr -cr "/Library/Audio/Plug-Ins/CLAP/pulsemidi-vst.clap" 2>/dev/null || true
+fi
+
+exit 0
