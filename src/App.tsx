@@ -142,7 +142,7 @@ function AboutModal({ onClose }: { onClose: () => void }) {
         <div className="modal-section" style={{ marginBottom: 0 }}>
           <div className="modal-section-title">License</div>
           <p style={{ fontSize: 11, color: "#52525b" }}>
-            MIT © Ernest Keyz Studios
+            © 2026 Ernest Keyz Studios — All Rights Reserved
           </p>
         </div>
       </div>

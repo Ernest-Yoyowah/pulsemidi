@@ -178,4 +178,4 @@ Created by **Ernest Keyz** / **Ernest Keyz Studios**.
 
 ## License
 
-MIT © Ernest Keyz Studios
+© 2026 Ernest Keyz Studios — All Rights Reserved
