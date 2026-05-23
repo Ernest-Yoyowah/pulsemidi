@@ -53,6 +53,15 @@ mkdir -p "$PKG_WORK/components" "$DIST"
 # Make scripts executable
 chmod +x "$SCRIPTS/preinstall" "$SCRIPTS/postinstall"
 
+# ── Compile GUI uninstaller app ──────────────────────────────────────────────
+
+info "Compiling Uninstall PulseMIDI.app…"
+UNINSTALLER_SRC="$RESOURCES/Uninstall PulseMIDI.applescript"
+UNINSTALLER_APP="$STAGING/Applications/Uninstall PulseMIDI.app"
+rm -rf "$UNINSTALLER_APP"
+osacompile -o "$UNINSTALLER_APP" "$UNINSTALLER_SRC"
+ok "Uninstaller app compiled"
+
 # ── Build component packages ─────────────────────────────────────────────────
 
 info "Building component: PulseMIDI.app (standalone)…"

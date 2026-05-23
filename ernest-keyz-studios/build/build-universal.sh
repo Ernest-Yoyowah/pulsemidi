@@ -139,6 +139,7 @@ rm -rf "$BUNDLE_X86" "$BUNDLE_ARM"
 
 info "Building Tauri standalone app (universal)…"
 cd "$REPO_ROOT"
+export PATH="$HOME/.cargo/bin:$PATH"
 npm ci --silent
 npm run tauri build -- --target universal-apple-darwin
 
