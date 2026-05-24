@@ -95,7 +95,7 @@ impl AtomicPluginState {
                     None
                 }
             })
-            .take(2)
+            .take(3)
             .collect()
     }
 }
@@ -114,7 +114,7 @@ pub struct PulseMidiParams {
 impl Default for PulseMidiParams {
     fn default() -> Self {
         Self {
-            editor_state: ViziaState::new(|| (1050, 600)),
+            editor_state: ViziaState::new(|| (1050, 650)),
         }
     }
 }

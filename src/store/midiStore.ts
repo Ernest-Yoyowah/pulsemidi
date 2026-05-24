@@ -42,11 +42,13 @@ interface MidiStore {
   pitchBend: number;
 
   activeKeyColor: string;
+  ccViewMode: "sliders" | "knobs";
 
   addEvent: (event: MidiEvent) => void;
   clearEvents: () => void;
   setPaused: (paused: boolean) => void;
   setActiveKeyColor: (color: string) => void;
+  setCcViewMode: (mode: "sliders" | "knobs") => void;
 }
 
 function updateDiagnostics(
@@ -142,6 +144,7 @@ export const useMidiStore = create<MidiStore>((set, get) => ({
   pitchBend: 0,
 
   activeKeyColor: "#22d3ee",
+  ccViewMode: "sliders",
 
   diagnostics: {
     stuckNotes: [],
@@ -239,4 +242,5 @@ export const useMidiStore = create<MidiStore>((set, get) => ({
 
   setPaused: (paused) => set({ isPaused: paused }),
   setActiveKeyColor: (color) => set({ activeKeyColor: color }),
+  setCcViewMode: (mode) => set({ ccViewMode: mode }),
 }));

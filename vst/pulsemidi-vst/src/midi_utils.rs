@@ -227,12 +227,13 @@ fn inversion_of(root: u8, pcs: &[u8], bass: u8) -> usize {
         .unwrap_or(0)
 }
 
-fn detect_interval(pcs: &[u8]) -> Option<String> {
+fn detect_interval(pcs: &[u8], bass_pc: u8) -> Option<String> {
     if pcs.len() != 2 {
         return None;
     }
 
-    let interval = (pcs[1] + 12 - pcs[0]) % 12;
+    let other_pc = pcs.iter().find(|&&p| p != bass_pc).copied().unwrap_or(pcs[1]);
+    let interval = (other_pc + 12 - bass_pc) % 12;
 
     let name = match interval {
         0 => "Unison",
@@ -259,18 +260,19 @@ pub fn detect_chord(notes: &[u8]) -> Option<ChordResult> {
     }
 
     let pcs = normalize(notes);
-
-    if let Some(interval_name) = detect_interval(&pcs) {
-        return Some(ChordResult {
-            name: interval_name,
-            root: String::new(),
-            symbol: String::new(),
-            bass: None,
-            inversion: 0,
-        });
-    }
-
     let bass_pc = notes.iter().min().unwrap() % 12;
+
+    if pcs.len() == 2 {
+        if let Some(interval_name) = detect_interval(&pcs, bass_pc) {
+            return Some(ChordResult {
+                name: interval_name,
+                root: String::new(),
+                symbol: String::new(),
+                bass: None,
+                inversion: 0,
+            });
+        }
+    }
 
     let mut best: Option<(u32, ChordResult)> = None;
 
@@ -319,9 +321,11 @@ pub fn detect_chord(notes: &[u8]) -> Option<ChordResult> {
                 inversion,
             };
 
+            let effective_priority = chord.priority + if root == bass_pc { 1200 } else { 0 };
+
             match &best {
-                Some((p, _)) if *p >= chord.priority => {}
-                _ => best = Some((chord.priority, result)),
+                Some((p, _)) if *p >= effective_priority => {}
+                _ => best = Some((effective_priority, result)),
             }
         }
     }

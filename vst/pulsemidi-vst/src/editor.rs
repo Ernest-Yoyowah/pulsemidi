@@ -9,8 +9,8 @@ use std::time::Duration;
 use crate::{midi_utils::{detect_chord, note_name}, AtomicPluginState};
 
 const WINDOW_WIDTH: u32 = 1050;
-const WINDOW_HEIGHT: u32 = 600;
-const KEYBOARD_HEIGHT: f32 = 110.0;
+const WINDOW_HEIGHT: u32 = 650;
+const KEYBOARD_HEIGHT: f32 = 130.0;
 
 const STYLE: &str = r#"
 * {
@@ -19,7 +19,7 @@ const STYLE: &str = r#"
 .root {
     background-color: #06060a;
     width: 1050px;
-    height: 600px;
+    height: 650px;
     overflow: hidden;
 }
 .topbar {
@@ -38,23 +38,23 @@ const STYLE: &str = r#"
     flex-grow: 1;
 }
 .wheels-left {
-    width: 90px;
+    width: 130px;
     border-right: 1px solid #1c1c22;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 10px;
+    padding-right: 10px;
     child-space: 1s;
     col-between: 10px;
 }
 .wheels-right {
-    width: 90px;
+    width: 170px;
     border-left: 1px solid #1c1c22;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 10px;
+    padding-right: 10px;
     child-space: 1s;
-    col-between: 10px;
+    col-between: 8px;
 }
 .wheel-col {
-    width: 22px;
+    width: 40px;
     row-between: 6px;
 }
 .brand-text {
@@ -80,7 +80,7 @@ const STYLE: &str = r#"
     font-size: 8px;
     letter-spacing: 2px;
     text-align: center;
-    width: 22px;
+    width: 40px;
 }
 .center {
     flex-grow: 1;
@@ -124,6 +124,55 @@ const STYLE: &str = r#"
     border-radius: 7px;
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
+.pedal-strip {
+    height: 50px;
+    border-top: 1px solid #1c1c22;
+    background-color: rgba(0, 0, 0, 0.25);
+    child-space: 1s;
+    col-between: 16px;
+}
+.pedal-btn {
+    width: 100px;
+    height: 32px;
+    border-radius: 6px;
+    background-color: #08080e;
+    border: 1px solid #1c1c22;
+    child-space: 1s;
+    col-between: 6px;
+}
+.pedal-btn-active {
+    width: 100px;
+    height: 32px;
+    border-radius: 6px;
+    background-color: rgba(34, 211, 238, 0.07);
+    border: 1px solid rgba(34, 211, 238, 0.25);
+    child-space: 1s;
+    col-between: 6px;
+}
+.pedal-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background-color: #27272a;
+}
+.pedal-dot-active {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background-color: #22d3ee;
+}
+.pedal-lbl {
+    color: #3f3f46;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+.pedal-lbl-active {
+    color: #67e8f9;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
 "#;
 
 const KEY_COLORS: &[(u8, u8, u8)] = &[
@@ -147,7 +196,7 @@ struct UiModel {
     right_bars: Vec<(String, f32)>,
     piano_states: Vec<(u8, u8)>,
     key_color_idx: u8,
-    sustain: bool,
+    pedal_states: Vec<bool>,
     plugin_state: Arc<AtomicPluginState>,
 }
 
@@ -187,8 +236,12 @@ impl Model for UiModel {
 
                 self.right_bars = self.plugin_state.interesting_ccs();
 
-                let sus = self.plugin_state.cc[64].load(Ordering::Relaxed);
-                self.sustain = sus >= 64;
+                self.pedal_states = vec![
+                    self.plugin_state.cc[64].load(Ordering::Relaxed) >= 64,
+                    self.plugin_state.cc[66].load(Ordering::Relaxed) >= 64,
+                    self.plugin_state.cc[67].load(Ordering::Relaxed) >= 64,
+                    self.plugin_state.cc[65].load(Ordering::Relaxed) >= 64,
+                ];
 
                 self.key_color_idx = self.plugin_state.key_color_idx.load(Ordering::Relaxed);
             }
@@ -220,7 +273,7 @@ pub fn create(
                 right_bars: Vec::new(),
                 piano_states: Vec::new(),
                 key_color_idx: 0,
-                sustain: false,
+                pedal_states: vec![false; 4],
                 plugin_state: plugin_state.clone(),
             }
             .build(cx);
@@ -242,12 +295,6 @@ pub fn create(
                     .col_between(Pixels(0.0));
 
                     Label::new(cx, "ERNEST KEYZ STUDIOS").class("brand-text");
-
-                    Binding::new(cx, UiModel::sustain, |cx, lens| {
-                        if lens.get(cx) {
-                            Label::new(cx, "\u{2299} SUS").class("sustain-badge");
-                        }
-                    });
 
                     Binding::new(cx, UiModel::bpm_text, |cx, lens| {
                         let text = lens.get(cx);
@@ -271,11 +318,11 @@ pub fn create(
                     HStack::new(cx, |cx| {
                         Binding::new(cx, UiModel::pitch_pct, |cx, lens| {
                             let v = lens.get(cx);
-                            render_wheel(cx, v, true, "PITCH");
+                            render_wheel(cx, v, true, "PITCH", 40.0, 180.0);
                         });
                         Binding::new(cx, UiModel::mod_pct, |cx, lens| {
                             let v = lens.get(cx);
-                            render_wheel(cx, v, false, "MOD");
+                            render_wheel(cx, v, false, "MOD", 40.0, 180.0);
                         });
                     })
                     .class("wheels-left");
@@ -308,7 +355,7 @@ pub fn create(
                         let bars = lens.get(cx);
                         HStack::new(cx, move |cx| {
                             for (label, value) in &bars {
-                                render_wheel(cx, *value, false, label);
+                                render_wheel(cx, *value, false, label, 40.0, 120.0);
                             }
                         })
                         .class("wheels-right");
@@ -325,6 +372,27 @@ pub fn create(
                             .width(Pixels(WINDOW_WIDTH as f32))
                             .height(Pixels(KEYBOARD_HEIGHT));
                     });
+                });
+
+                Binding::new(cx, UiModel::pedal_states, |cx, lens| {
+                    let pedal_states = lens.get(cx);
+                    let labels = ["SUSTAIN", "SOSTENUTO", "SOFT PEDAL", "PORTAMENTO"];
+                    HStack::new(cx, move |cx| {
+                        for i in 0..4 {
+                            let active = pedal_states.get(i).copied().unwrap_or(false);
+                            let label = labels[i];
+                            let btn_cls = if active { "pedal-btn-active" } else { "pedal-btn" };
+                            let dot_cls = if active { "pedal-dot-active" } else { "pedal-dot" };
+                            let lbl_cls = if active { "pedal-lbl-active" } else { "pedal-lbl" };
+                            HStack::new(cx, move |cx| {
+                                Element::new(cx).class(dot_cls);
+                                Label::new(cx, label).class(lbl_cls);
+                            })
+                            .class(btn_cls);
+                        }
+                    })
+                    .width(Pixels(WINDOW_WIDTH as f32))
+                    .class("pedal-strip");
                 });
             })
             .width(Pixels(WINDOW_WIDTH as f32))
@@ -417,12 +485,14 @@ impl View for WheelCanvas {
         let y = b.y;
         let w = b.w;
         let h = b.h;
-        let r = (w / 2.0).min(11.0);
+        let r = (w / 2.0).min(20.0);
 
+        // Housing background
         let mut bg = vg::Path::new();
         bg.rounded_rect(x, y, w, h, r);
-        canvas.fill_path(&bg, &vg::Paint::color(vg::Color::rgba(14, 14, 20, 255)));
+        canvas.fill_path(&bg, &vg::Paint::color(vg::Color::rgba(8, 8, 14, 255)));
 
+        // Color fill indicator
         if self.centered {
             let abs_pct = self.pct.abs().clamp(0.0, 1.0);
             if abs_pct > 0.02 {
@@ -433,42 +503,64 @@ impl View for WheelCanvas {
                     y + h / 2.0
                 };
                 let color = if self.pct > 0.0 {
-                    vg::Color::rgba(34, 211, 238, 200)
+                    vg::Color::rgba(34, 211, 238, 190)
                 } else {
-                    vg::Color::rgba(251, 191, 36, 200)
+                    vg::Color::rgba(251, 191, 36, 190)
                 };
                 let mut fp = vg::Path::new();
-                fp.rect(x + 1.0, fill_y, w - 2.0, fill_h);
+                fp.rect(x + 1.5, fill_y, w - 3.0, fill_h);
                 canvas.fill_path(&fp, &vg::Paint::color(color));
             }
-            let mut cp = vg::Path::new();
-            cp.rect(x, y + h / 2.0 - 0.5, w, 1.0);
-            canvas.fill_path(&cp, &vg::Paint::color(vg::Color::rgba(255, 255, 255, 38)));
         } else {
             let clamped = self.pct.clamp(0.0, 1.0);
             if clamped > 0.005 {
                 let fill_h = clamped * h;
                 let mut fp = vg::Path::new();
-                fp.rect(x + 1.0, y + h - fill_h, w - 2.0, fill_h);
-                canvas.fill_path(&fp, &vg::Paint::color(vg::Color::rgba(34, 211, 238, 160)));
+                fp.rect(x + 1.5, y + h - fill_h, w - 3.0, fill_h);
+                canvas.fill_path(&fp, &vg::Paint::color(vg::Color::rgba(167, 139, 250, 170)));
             }
         }
 
-        let mut bp = vg::Paint::color(vg::Color::rgba(32, 32, 40, 200));
-        bp.set_line_width(1.0);
+        // Grip texture lines
+        let line_spacing = 8.0_f32;
+        let shift = (self.pct.abs() * 120.0) % line_spacing;
+        let mut grip_path = vg::Path::new();
+        let mut grip_y = y + shift;
+        while grip_y < y + h {
+            grip_path.move_to(x + 3.0, grip_y);
+            grip_path.line_to(x + w - 3.0, grip_y);
+            grip_y += line_spacing;
+        }
+        let mut grip_paint = vg::Paint::color(vg::Color::rgba(255, 255, 255, 16));
+        grip_paint.set_line_width(1.5);
+        canvas.stroke_path(&grip_path, &grip_paint);
+
+        // Center tick for pitch bend
+        if self.centered {
+            let mut cp = vg::Path::new();
+            cp.move_to(x + 3.0, y + h / 2.0);
+            cp.line_to(x + w - 3.0, y + h / 2.0);
+            let mut cp_paint = vg::Paint::color(vg::Color::rgba(255, 255, 255, 55));
+            cp_paint.set_line_width(1.5);
+            canvas.stroke_path(&cp, &cp_paint);
+        }
+
+        // Border
+        let mut bp = vg::Paint::color(vg::Color::rgba(22, 22, 32, 220));
+        bp.set_line_width(1.5);
         let mut bpath = vg::Path::new();
-        bpath.rounded_rect(x + 0.5, y + 0.5, w - 1.0, h - 1.0, r - 0.5);
+        bpath.rounded_rect(x + 0.75, y + 0.75, w - 1.5, h - 1.5, r - 0.75);
         canvas.stroke_path(&bpath, &bp);
     }
 }
 
-fn render_wheel(cx: &mut Context, pct: f32, centered: bool, label: &str) {
+fn render_wheel(cx: &mut Context, pct: f32, centered: bool, label: &str, wheel_w: f32, wheel_h: f32) {
     let label = label.to_string();
     VStack::new(cx, move |cx| {
         WheelCanvas { pct, centered }
             .build(cx, |_| {})
-            .width(Pixels(22.0))
-            .height(Pixels(140.0));
+            .width(Pixels(wheel_w))
+            .height(Pixels(wheel_h));
         Label::new(cx, &label).class("wheel-label");
     })
     .class("wheel-col");
