@@ -235,16 +235,8 @@ function inversionOf(root: number, pcs: number[], bass: number): number {
   );
 }
 
-function detectInterval(pcs: number[]): string | null {
-  if (pcs.length !== 2) {
-    return null;
-  }
-
-  const interval = (pcs[1] - pcs[0] + 12) % 12;
-
-  switch (interval) {
-    case 0:
-      return "Unison";
+function detectInterval(semitones: number): string | null {
+  switch (semitones) {
     case 1:
       return "Minor 2nd";
     case 2:
@@ -278,19 +270,16 @@ export function detectChord(noteNumbers: number[]): ChordResult | null {
   }
 
   const pcs = normalize(noteNumbers);
-
-  const intervalName = detectInterval(pcs);
-
-  if (intervalName) {
-    return {
-      name: intervalName,
-      root: "",
-      symbol: "",
-      inversion: 0,
-    };
-  }
-
   const bassPc = ((Math.min(...noteNumbers) % 12) + 12) % 12;
+
+  if (pcs.length === 2) {
+    const otherPc = pcs.find((p) => p !== bassPc) ?? pcs[1];
+    const semitones = (otherPc - bassPc + 12) % 12;
+    const intervalName = detectInterval(semitones);
+    if (intervalName) {
+      return { name: intervalName, root: "", symbol: "", inversion: 0 };
+    }
+  }
 
   let best:
     | {
@@ -336,9 +325,11 @@ export function detectChord(noteNumbers: number[]): ChordResult | null {
         inversion,
       };
 
-      if (!best || chord.priority > best.priority) {
+      const adjustedPriority = chord.priority + (root === bassPc ? 1200 : 0);
+
+      if (!best || adjustedPriority > best.priority) {
         best = {
-          priority: chord.priority,
+          priority: adjustedPriority,
           result,
         };
       }
