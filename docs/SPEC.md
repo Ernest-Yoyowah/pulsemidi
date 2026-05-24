@@ -223,12 +223,13 @@ interface MidiDevice {
 
 ## 8. Known Limitations & Roadmap
 
-| Item                             | Status                                                  |
-| -------------------------------- | ------------------------------------------------------- |
-| macOS only (CoreMIDI)            | Current. Linux/Windows via midir feature flags planned. |
-| MIDI output / routing            | Not implemented. Read-only monitor only.                |
-| MIDI file recording              | Not implemented.                                        |
-| Virtual MIDI ports               | Not supported yet.                                      |
-| SysEx messages                   | Parsed as `unknown`; full SysEx display planned.        |
-| MPE (MIDI Polyphonic Expression) | Not supported.                                          |
-| MIDI 2.0 / UMP                   | Not supported.                                          |
+| Item                             | Status                                                                                                                                                                                                                                                                                                                |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| macOS only (CoreMIDI)            | Current. Linux/Windows via midir feature flags planned.                                                                                                                                                                                                                                                               |
+| MIDI output / routing            | Not implemented. Read-only monitor only.                                                                                                                                                                                                                                                                              |
+| MIDI file recording              | Not implemented.                                                                                                                                                                                                                                                                                                      |
+| Virtual MIDI ports               | Not supported yet.                                                                                                                                                                                                                                                                                                    |
+| SysEx messages                   | Parsed as `unknown`; full SysEx display planned.                                                                                                                                                                                                                                                                      |
+| MPE (MIDI Polyphonic Expression) | Not supported.                                                                                                                                                                                                                                                                                                        |
+| MIDI 2.0 / UMP                   | Not supported.                                                                                                                                                                                                                                                                                                        |
+| **Transpose display** (v1.2)     | Planned. Musician plays in key X; app detects chords and optionally re-displays them transposed into a target key (e.g. E→G). Useful for teaching: student sees chord names in their preferred key while the performer plays in another. UI: a ±12 semitone offset picker in the Settings modal or live-view toolbar. |

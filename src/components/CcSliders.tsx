@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useMidiStore } from "../store/midiStore";
 import { getCcName } from "../utils/noteUtils";
 
@@ -13,49 +12,117 @@ function CcRow({ cc, value }: { cc: number; value: number }) {
 
   return (
     <div className="cc-slider-row">
-      <div className="flex items-center justify-between mb-0.5">
-        <span className="text-[10px] text-zinc-500 truncate leading-none">
-          <span className="font-mono text-zinc-600 mr-1">CC{cc}</span>
+      <div className="flex items-center justify-between mb-1.5">
+        <span
+          style={{
+            fontSize: 10,
+            color: "#71717a",
+            letterSpacing: "0.04em",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "monospace",
+              color: "#52525b",
+              marginRight: 4,
+            }}
+          >
+            CC{cc}
+          </span>
           {name}
         </span>
-        <span className="text-[10px] font-mono text-cyan-400 shrink-0 ml-1">
+        <span
+          style={{
+            fontSize: 11,
+            fontFamily: "monospace",
+            fontWeight: 700,
+            color: isBool ? (isOn ? "#34d399" : "#52525b") : "#22d3ee",
+            flexShrink: 0,
+            marginLeft: 8,
+          }}
+        >
           {isBool ? (isOn ? "ON" : "OFF") : value}
         </span>
       </div>
 
       {isBool ? (
         <div
-          className={`h-1.5 rounded-full transition-all duration-[16ms] ${
-            isOn ? "bg-cyan-500" : "bg-zinc-700"
-          }`}
+          style={{
+            height: 4,
+            borderRadius: 2,
+            background: isOn
+              ? "linear-gradient(90deg, rgba(52,211,153,0.5), rgba(52,211,153,1))"
+              : "rgba(39,39,42,0.8)",
+            transition: "background 80ms",
+          }}
         />
       ) : isCenter ? (
-        /* Bidirectional bar — neutral at 50% */
-        <div className="h-1.5 bg-zinc-800 rounded-full relative overflow-hidden">
+        <div
+          style={{
+            height: 4,
+            background: "rgba(39,39,42,0.8)",
+            borderRadius: 2,
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
           {value >= 64 ? (
             <div
-              className="absolute h-full bg-cyan-500 transition-all duration-[16ms]"
               style={{
+                position: "absolute",
+                height: "100%",
                 left: "50%",
                 width: `${((value - 64) / 63) * 50}%`,
+                background:
+                  "linear-gradient(90deg, rgba(34,211,238,0.5), rgba(34,211,238,1))",
+                transition: "width 16ms linear",
               }}
             />
           ) : (
             <div
-              className="absolute h-full bg-cyan-500 transition-all duration-[16ms]"
               style={{
+                position: "absolute",
+                height: "100%",
                 right: "50%",
                 width: `${((64 - value) / 64) * 50}%`,
+                background:
+                  "linear-gradient(270deg, rgba(34,211,238,0.5), rgba(34,211,238,1))",
+                transition: "width 16ms linear",
               }}
             />
           )}
-          <div className="absolute inset-y-0 left-1/2 w-px bg-zinc-600 pointer-events-none" />
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              left: "calc(50% - 0.5px)",
+              width: 1,
+              background: "rgba(99,99,102,0.6)",
+              pointerEvents: "none",
+            }}
+          />
         </div>
       ) : (
-        <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+        <div
+          style={{
+            height: 4,
+            background: "rgba(39,39,42,0.8)",
+            borderRadius: 2,
+            overflow: "hidden",
+          }}
+        >
           <div
-            className="h-full bg-cyan-500 rounded-full transition-all duration-[16ms]"
-            style={{ width: `${(value / 127) * 100}%` }}
+            style={{
+              height: "100%",
+              width: `${(value / 127) * 100}%`,
+              background:
+                "linear-gradient(90deg, rgba(34,211,238,0.4), rgba(34,211,238,1))",
+              borderRadius: 2,
+              transition: "width 16ms linear",
+            }}
           />
         </div>
       )}
@@ -147,7 +214,7 @@ function CcKnob({ cc, value }: { cc: number; value: number }) {
 
 export default function CcSliders() {
   const ccValues = useMidiStore((s) => s.ccValues);
-  const [viewMode, setViewMode] = useState<"sliders" | "knobs">("sliders");
+  const viewMode = useMidiStore((s) => s.ccViewMode);
 
   const entries = Array.from(ccValues.entries()).sort((a, b) => a[0] - b[0]);
 
@@ -155,22 +222,6 @@ export default function CcSliders() {
     <div className="card flex flex-col gap-2 h-full min-h-0">
       <div className="flex items-center justify-between">
         <h2 className="section-title">Controllers</h2>
-        <div className="view-toggle">
-          <button
-            className={`view-toggle__btn ${viewMode === "sliders" ? "view-toggle__btn--active" : ""}`}
-            onClick={() => setViewMode("sliders")}
-            title="Slider view"
-          >
-            &#9776;
-          </button>
-          <button
-            className={`view-toggle__btn ${viewMode === "knobs" ? "view-toggle__btn--active" : ""}`}
-            onClick={() => setViewMode("knobs")}
-            title="Knob view"
-          >
-            &#9711;
-          </button>
-        </div>
       </div>
 
       {entries.length === 0 ? (

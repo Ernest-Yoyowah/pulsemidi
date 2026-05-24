@@ -39,6 +39,8 @@ function MidiStatusDot() {
 function SettingsModal({ onClose }: { onClose: () => void }) {
   const activeKeyColor = useMidiStore((s) => s.activeKeyColor);
   const setActiveKeyColor = useMidiStore((s) => s.setActiveKeyColor);
+  const ccViewMode = useMidiStore((s) => s.ccViewMode);
+  const setCcViewMode = useMidiStore((s) => s.setCcViewMode);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -82,6 +84,43 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
                 opacity: 0.85,
               }}
             />
+          </div>
+        </div>
+
+        <div className="modal-section">
+          <div className="modal-section-title">Controllers</div>
+          <div className="modal-row">
+            <span className="modal-label">CC view mode</span>
+            <div style={{ display: "flex", gap: 4 }}>
+              {(["sliders", "knobs"] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setCcViewMode(m)}
+                  style={{
+                    padding: "4px 12px",
+                    fontSize: 11,
+                    fontWeight: 600,
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                    borderRadius: 6,
+                    border: "1px solid",
+                    cursor: "pointer",
+                    transition: "all 120ms",
+                    background:
+                      ccViewMode === m
+                        ? "rgba(34,211,238,0.12)"
+                        : "transparent",
+                    borderColor:
+                      ccViewMode === m
+                        ? "rgba(34,211,238,0.35)"
+                        : "rgba(63,63,70,0.5)",
+                    color: ccViewMode === m ? "#22d3ee" : "#71717a",
+                  }}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -11,18 +11,15 @@ export default function Dashboard() {
       <RoutingVisualization />
 
       <div className="flex flex-1 gap-3 min-h-0">
-        {/* Left sidebar: devices + diagnostics */}
         <div className="flex flex-col gap-3 w-56 shrink-0">
           <DeviceManager />
           <DiagnosticsPanel />
         </div>
 
-        {/* Center: scrolling MIDI log */}
         <div className="flex-1 min-w-0">
           <MidiMonitor />
         </div>
 
-        {/* Right sidebar: live CC sliders */}
         <div className="w-52 shrink-0">
           <CcSliders />
         </div>
