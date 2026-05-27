@@ -45,14 +45,6 @@ const STYLE: &str = r#"
     child-space: 1s;
     col-between: 10px;
 }
-.wheels-right {
-    width: 170px;
-    border-left: 1px solid #1c1c22;
-    padding-left: 10px;
-    padding-right: 10px;
-    child-space: 1s;
-    col-between: 8px;
-}
 .wheel-col {
     width: 40px;
     row-between: 6px;
