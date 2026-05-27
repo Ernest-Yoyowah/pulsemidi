@@ -1,89 +1,146 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <style>
+      :root {
+        --bg: #0a0a0b;
+        --card: #111113;
+        --border: rgba(63, 63, 70, 0.45);
+
+        --text: #f4f4f5;
+        --muted: #a1a1aa;
+        --soft: #71717a;
+
+        --accent: #22d3ee;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
-        font-family: -apple-system, "Helvetica Neue", sans-serif;
-        background: #0a0a0b;
-        color: #e4e4e7;
         margin: 0;
         padding: 28px 32px;
+
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+
+        background: var(--bg);
+        color: var(--text);
       }
+
       .checkmark {
         font-size: 36px;
         margin-bottom: 12px;
       }
+
       h2 {
+        margin: 0 0 8px;
+
         font-size: 17px;
         font-weight: 700;
-        color: #f4f4f5;
-        margin: 0 0 8px;
+        color: var(--text);
       }
+
       .sub {
+        margin-bottom: 24px;
+
         font-size: 11px;
-        color: #52525b;
         letter-spacing: 0.15em;
         text-transform: uppercase;
-        margin-bottom: 24px;
+
+        color: var(--muted);
       }
+
       p {
-        font-size: 13px;
-        color: #a1a1aa;
-        line-height: 1.65;
         margin: 0 0 14px;
+
+        font-size: 13px;
+        line-height: 1.65;
+
+        color: var(--muted);
       }
+
       .item {
         display: flex;
         align-items: flex-start;
         gap: 10px;
-        background: #111113;
-        border: 1px solid rgba(63, 63, 70, 0.45);
+
+        margin-bottom: 10px;
+        padding: 12px 14px;
+
+        background: var(--card);
+        border: 1px solid var(--border);
         border-radius: 10px;
-        padding: 10px 14px;
-        margin-bottom: 8px;
       }
+
       .item-icon {
-        font-size: 16px;
         flex-shrink: 0;
+        font-size: 16px;
+        line-height: 1.2;
       }
+
       .item-title {
+        margin-bottom: 4px;
+
         font-size: 12px;
         font-weight: 600;
-        color: #e4e4e7;
+
+        color: var(--text);
       }
+
       .item-path {
         font-size: 10px;
-        color: #52525b;
+        line-height: 1.5;
+
         font-family: monospace;
+        word-break: break-all;
+
+        color: var(--soft);
       }
+
       .tip {
-        font-size: 12px;
-        color: #52525b;
         margin-top: 18px;
+
+        font-size: 12px;
+        line-height: 1.7;
+
+        color: var(--muted);
       }
+
       .highlight {
-        color: #22d3ee;
+        color: var(--accent);
+        font-weight: 600;
       }
     </style>
   </head>
+
   <body>
     <div class="checkmark">✓</div>
+
     <h2>PulseMIDI is installed</h2>
+
     <div class="sub">Ernest Keyz Studios · v1.1.0</div>
 
     <div class="item">
       <div class="item-icon">🎹</div>
+
       <div>
         <div class="item-title">PulseMIDI — Standalone App</div>
+
         <div class="item-path">/Applications/PulseMIDI.app</div>
       </div>
     </div>
 
     <div class="item">
       <div class="item-icon">🔌</div>
+
       <div>
         <div class="item-title">pulsemidi-vst · VST3 Plugin</div>
+
         <div class="item-path">
           /Library/Audio/Plug-Ins/VST3/pulsemidi-vst.vst3
         </div>
@@ -92,8 +149,10 @@
 
     <div class="item">
       <div class="item-icon">🔌</div>
+
       <div>
         <div class="item-title">pulsemidi-vst · CLAP Plugin</div>
+
         <div class="item-path">
           /Library/Audio/Plug-Ins/CLAP/pulsemidi-vst.clap
         </div>
@@ -101,10 +160,11 @@
     </div>
 
     <p class="tip">
-      In your DAW, scan for new plugins or restart the app.<br />
+      In your DAW, scan for new plugins or restart the app.
+      <br />
       The plugin appears under
-      <span class="highlight"
-        >Instruments → Ernest Keyz Studios → PulseMIDI</span
+      <span class="highlight">
+        Instruments → Ernest Keyz Studios → PulseMIDI </span
       >.
     </p>
   </body>
