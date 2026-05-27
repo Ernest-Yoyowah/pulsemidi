@@ -130,6 +130,6 @@ APP_BIN="$STAGING/Applications/PulseMIDI.app/Contents/MacOS/PulseMIDI"
 echo "  App:   $(lipo -archs "$APP_BIN" 2>/dev/null || echo 'check manually')"
 
 echo ""
-ok "Universal build complete → $_STAGING"
+ok "Universal build complete → $STAGING"
 echo "  Next step: run ./create-installer.sh"
 echo ""

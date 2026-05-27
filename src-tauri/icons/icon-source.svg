@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#111116"/>
+      <stop offset="100%" stop-color="#09090b"/>
+    </linearGradient>
+    <filter id="blur16" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+    <filter id="blur32" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="32"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="1024" height="1024" rx="196" fill="url(#bgGrad)"/>
+
+  <!-- Cyan ambient halo behind waveform -->
+  <ellipse cx="380" cy="400" rx="310" ry="260" fill="#22d3ee" opacity="0.07" filter="url(#blur32)"/>
+
+  <!-- Piano white keys (C D E F G A B) — y=690 to y=940 -->
+  <rect x="80"  y="690" width="119" height="250" rx="10" fill="#1a1a21"/>
+  <rect x="203" y="690" width="119" height="250" rx="10" fill="#1a1a21"/>
+  <rect x="326" y="690" width="119" height="250" rx="10" fill="#1a1a21"/>
+  <rect x="449" y="690" width="119" height="250" rx="10" fill="#1a1a21"/>
+  <rect x="572" y="690" width="119" height="250" rx="10" fill="#1a1a21"/>
+  <rect x="695" y="690" width="119" height="250" rx="10" fill="#1a1a21"/>
+  <rect x="818" y="690" width="119" height="250" rx="10" fill="#1a1a21"/>
+
+  <!-- Active key highlight (E key — aligns with pulse peak) -->
+  <rect x="326" y="690" width="119" height="250" rx="10"
+        fill="rgba(34,211,238,0.07)" stroke="#22d3ee" stroke-width="1.5" stroke-opacity="0.25"/>
+
+  <!-- Piano black keys (C# D# F# G# A#) -->
+  <rect x="127" y="690" width="72" height="148" rx="6" fill="#07070a"/>
+  <rect x="250" y="690" width="72" height="148" rx="6" fill="#07070a"/>
+  <!-- E–F gap has no black key -->
+  <rect x="496" y="690" width="72" height="148" rx="6" fill="#07070a"/>
+  <rect x="619" y="690" width="72" height="148" rx="6" fill="#07070a"/>
+  <rect x="742" y="690" width="72" height="148" rx="6" fill="#07070a"/>
+
+  <!-- Waveform glow (blurred layer) -->
+  <polyline
+    points="80,420 290,420 355,162 415,618 475,420 944,420"
+    fill="none" stroke="#22d3ee" stroke-width="44"
+    stroke-linecap="round" stroke-linejoin="round"
+    filter="url(#blur16)" opacity="0.45"/>
+
+  <!-- Waveform main line -->
+  <polyline
+    points="80,420 290,420 355,162 415,618 475,420 944,420"
+    fill="none" stroke="#22d3ee" stroke-width="22"
+    stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Peak dot glow -->
+  <circle cx="355" cy="162" r="30" fill="#22d3ee" filter="url(#blur16)" opacity="0.55"/>
+  <!-- Peak dot solid -->
+  <circle cx="355" cy="162" r="15" fill="#ffffff"/>
+
+  <!-- Thin bottom key separator line -->
+  <line x1="80" y1="688" x2="944" y2="688" stroke="#22d3ee" stroke-width="1" stroke-opacity="0.12"/>
+
+  <!-- Subtle outer border -->
+  <rect width="1024" height="1024" rx="196" fill="none"
+        stroke="#22d3ee" stroke-width="2" stroke-opacity="0.06"/>
+</svg>
