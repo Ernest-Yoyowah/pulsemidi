@@ -45,14 +45,6 @@ const STYLE: &str = r#"
     child-space: 1s;
     col-between: 10px;
 }
-.wheels-right {
-    width: 170px;
-    border-left: 1px solid #1c1c22;
-    padding-left: 10px;
-    padding-right: 10px;
-    child-space: 1s;
-    col-between: 8px;
-}
 .wheel-col {
     width: 40px;
     row-between: 6px;
@@ -193,7 +185,6 @@ struct UiModel {
     bpm_text: String,
     pitch_pct: f32,
     mod_pct: f32,
-    right_bars: Vec<(String, f32)>,
     piano_states: Vec<(u8, u8)>,
     key_color_idx: u8,
     pedal_states: Vec<bool>,
@@ -234,8 +225,6 @@ impl Model for UiModel {
                 let mod_val = self.plugin_state.cc[1].load(Ordering::Relaxed);
                 self.mod_pct = mod_val as f32 / 127.0;
 
-                self.right_bars = self.plugin_state.interesting_ccs();
-
                 self.pedal_states = vec![
                     self.plugin_state.cc[64].load(Ordering::Relaxed) >= 64,
                     self.plugin_state.cc[66].load(Ordering::Relaxed) >= 64,
@@ -270,7 +259,6 @@ pub fn create(
                 bpm_text: String::new(),
                 pitch_pct: 0.0,
                 mod_pct: 0.0,
-                right_bars: Vec::new(),
                 piano_states: Vec::new(),
                 key_color_idx: 0,
                 pedal_states: vec![false; 4],
@@ -351,15 +339,6 @@ pub fn create(
                     })
                     .class("center");
 
-                    Binding::new(cx, UiModel::right_bars, |cx, lens| {
-                        let bars = lens.get(cx);
-                        HStack::new(cx, move |cx| {
-                            for (label, value) in &bars {
-                                render_wheel(cx, *value, false, label, 40.0, 120.0);
-                            }
-                        })
-                        .class("wheels-right");
-                    });
                 })
                 .class("stage");
 
@@ -487,12 +466,10 @@ impl View for WheelCanvas {
         let h = b.h;
         let r = (w / 2.0).min(20.0);
 
-        // Housing background
         let mut bg = vg::Path::new();
         bg.rounded_rect(x, y, w, h, r);
         canvas.fill_path(&bg, &vg::Paint::color(vg::Color::rgba(8, 8, 14, 255)));
 
-        // Color fill indicator
         if self.centered {
             let abs_pct = self.pct.abs().clamp(0.0, 1.0);
             if abs_pct > 0.02 {
@@ -507,21 +484,22 @@ impl View for WheelCanvas {
                 } else {
                     vg::Color::rgba(251, 191, 36, 190)
                 };
+                let fr = r.min((w - 3.0) / 2.0).min(fill_h / 2.0).max(0.0);
                 let mut fp = vg::Path::new();
-                fp.rect(x + 1.5, fill_y, w - 3.0, fill_h);
+                fp.rounded_rect(x + 1.5, fill_y, w - 3.0, fill_h, fr);
                 canvas.fill_path(&fp, &vg::Paint::color(color));
             }
         } else {
             let clamped = self.pct.clamp(0.0, 1.0);
             if clamped > 0.005 {
                 let fill_h = clamped * h;
+                let fr = r.min((w - 3.0) / 2.0).min(fill_h / 2.0).max(0.0);
                 let mut fp = vg::Path::new();
-                fp.rect(x + 1.5, y + h - fill_h, w - 3.0, fill_h);
+                fp.rounded_rect(x + 1.5, y + h - fill_h, w - 3.0, fill_h, fr);
                 canvas.fill_path(&fp, &vg::Paint::color(vg::Color::rgba(167, 139, 250, 170)));
             }
         }
 
-        // Grip texture lines
         let line_spacing = 8.0_f32;
         let shift = (self.pct.abs() * 120.0) % line_spacing;
         let mut grip_path = vg::Path::new();
@@ -535,7 +513,6 @@ impl View for WheelCanvas {
         grip_paint.set_line_width(1.5);
         canvas.stroke_path(&grip_path, &grip_paint);
 
-        // Center tick for pitch bend
         if self.centered {
             let mut cp = vg::Path::new();
             cp.move_to(x + 3.0, y + h / 2.0);
@@ -545,7 +522,6 @@ impl View for WheelCanvas {
             canvas.stroke_path(&cp, &cp_paint);
         }
 
-        // Border
         let mut bp = vg::Paint::color(vg::Color::rgba(22, 22, 32, 220));
         bp.set_line_width(1.5);
         let mut bpath = vg::Path::new();
